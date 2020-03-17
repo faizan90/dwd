@@ -84,7 +84,7 @@ def main():
         common_stns.size,
         'stations are common between data_df and crds_df!')
 
-    assert common_stns.size, 'No sstations selected!'
+    assert common_stns.size, 'No stations selected!'
 
     print('Writing output...')
 
