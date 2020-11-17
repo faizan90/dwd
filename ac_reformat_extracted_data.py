@@ -17,6 +17,8 @@ from multiprocessing import Pool
 
 DEBUG_FLAG = True
 
+DATA_TXT_PREF = 'produkt*'
+
 
 def ret_mp_idxs(n_vals, n_cpus):
 
@@ -58,7 +60,7 @@ def reformat_and_save(args):
         dir_ctr += 1
 
         stn_file_ctr = 0
-        for stn_file in stn_dir.glob('./produkt*'):
+        for stn_file in stn_dir.glob(f'./{DATA_TXT_PREF}'):
             file_ctr += 1
             stn_file_ctr += 1
 
@@ -162,35 +164,39 @@ def check_and_get_valid_column(raw_df_cols, chk_cols, label):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo')
+    main_dir = Path(r'T:\1_minute\precipitation')
     os.chdir(main_dir)
 
-    in_dir = Path(r'extracted_http/pres_hourly_precip_http')
+    # DATA_TXT_PREF might need changing.
+
+    in_dir = Path(r'extracted')
 
     # all columns are stripped of white spaces, and are capitalized
 
     # one of these should be in the file
 
 #     # Precip
-    data_cols = ['R1', 'NIEDERSCHLAGSHOEHE']
+    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
     out_data_col_pref = 'P'
 
     # Temp
 #     data_cols = ['LUFTTEMPERATUR', 'TT_TU']
 #     out_data_col_pref = 'T'
 
+    match_patt = '1minutenwerte_nieder_*'
+
     time_cols = ['MESS_DATUM']
     stn_cols = ['STATIONS_ID']
 
     seps = [';']
 
-    time_fmts = ['%Y%m%d%H']
+    time_fmts = ['%Y%m%d%H%M']
 
     nan_vals = [-999]
 
     out_ext = 'csv'
 
-    out_time_fmt = '%Y-%m-%d-%H'
+    out_time_fmt = '%Y-%m-%d-%H-%M'
 
     out_sep = ';'
 
@@ -198,7 +204,7 @@ def main():
 
     del_out_dir_contents_flag = True
 
-    n_cpus = 14
+    n_cpus = 7
 
     if out_dir.exists() and del_out_dir_contents_flag:
         for stn_file in out_dir.glob(f'./{out_data_col_pref}*.{out_ext}'):
@@ -207,7 +213,7 @@ def main():
     else:
         out_dir.mkdir(exist_ok=True)
 
-    all_stn_dirs = list(in_dir.glob('./stundenwerte*'))
+    all_stn_dirs = list(in_dir.glob(f'./{match_patt}'))
 
     assert all_stn_dirs, 'No directories selected!'
 

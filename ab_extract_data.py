@@ -18,10 +18,10 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'E:\dwd_meteo')
+    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
     os.chdir(main_dir)
 
-    in_dir = Path(r'zipped_DWD_data')
+    in_dir = Path(r'historical')
     out_dir = Path(r'extracted')
 
     zip_exe = Path(r'C:\Program Files\7-Zip\7z.exe')
