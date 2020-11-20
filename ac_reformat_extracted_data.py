@@ -202,7 +202,7 @@ def main():
 
     out_dir = Path(f'reformatted/{in_dir.name}')
 
-    del_out_dir_contents_flag = True
+    del_out_dir_contents_flag = False
 
     n_cpus = 7
 

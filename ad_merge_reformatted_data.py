@@ -19,23 +19,23 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo')
+    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
     os.chdir(main_dir)
 
     # format depends on 02_reformat_extracted_ppt_data.py
 
-    in_dir = Path('reformatted/hist_hourly_precip')
+    in_dir = Path(r'reformatted\recent')
 
-    # if exists, will be upodated with new data
+    # if exists, will be updated with new data
     # if does not exist, then is created
     ref_df_path = Path(f'reformatted_merged/{in_dir.name}.csv')
 
-    beg_time = '2008-01-01-00'
-    end_time = '2019-12-31-23'
+    beg_time = '2019-01-01-00-00'
+    end_time = '2019-04-30-23-59'
 
-    freq = 'H'
+    freq = 'min'
 
-    time_fmt = '%Y-%m-%d-%H'
+    time_fmt = '%Y-%m-%d-%H-%M'
 
     sep = ';'
 
@@ -59,6 +59,8 @@ def main():
             freq=freq)
 
         ref_df = pd.DataFrame(index=ref_index, dtype=float)
+
+        ref_df_path.parents[0].mkdir(exist_ok=True)
 
         print('Done creating ref_df!')
 
