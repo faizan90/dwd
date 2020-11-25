@@ -21,7 +21,7 @@ def main():
     main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
     os.chdir(main_dir)
 
-    in_dir = Path(r'historical')
+    in_dir = Path(r'meta_data')
     out_dir = Path(r'extracted')
 
     zip_exe = Path(r'C:\Program Files\7-Zip\7z.exe')
@@ -34,7 +34,7 @@ def main():
 
     assert zip_exe.exists(), '7-Zip executable not found!'
 
-    out_dir.mkdir(exist_ok=True)
+    out_dir.mkdir(exist_ok=True, parents=True)
 
     zip_exe = str(zip_exe)
 

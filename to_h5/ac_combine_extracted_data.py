@@ -155,8 +155,7 @@ def validate_h5_file(
         end_time,
         nc_calendar,
         nc_units,
-        out_freq,
-        out_time_fmt):
+        out_freq):
 
     n_steps = 0
 
@@ -185,7 +184,7 @@ def validate_h5_file(
 
         n_steps = dates_times.shape[0]
 
-        dates_times_strs = dates_times.strftime(out_time_fmt)
+        dates_times_strs = dates_times.strftime('%Y%m%d%H%M')
 
         h5_str_dt = h5py.special_dtype(vlen=str)
 
@@ -200,7 +199,7 @@ def validate_h5_file(
             dates_times.to_pydatetime(), nc_units, nc_calendar)
 
         time_nums_ds = time_grp.create_dataset(
-            'time', (dates_times.shape[0],), dtype=np.uint64)
+            'time', (dates_times.shape[0],), dtype=np.int64)
 
         time_nums_ds[:] = dates_times_nums
 
@@ -216,7 +215,6 @@ def write_updt_h5_file(
         nc_calendar,
         nc_units,
         out_freq,
-        out_time_fmt,
         out_df,
         sel_idxs,
         stn_id_str):
@@ -229,8 +227,7 @@ def write_updt_h5_file(
         end_time,
         nc_calendar,
         nc_units,
-        out_freq,
-        out_time_fmt)
+        out_freq)
 
     assert n_steps > 0
     assert n_steps >= sel_idxs.sum()
@@ -269,7 +266,6 @@ def write_stn_to_h5(
         nc_calendar,
         nc_units,
         out_freq,
-        out_time_fmt,
         out_df,
         sel_idxs,
         stn_id_str):
@@ -294,7 +290,6 @@ def write_stn_to_h5(
         nc_calendar,
         nc_units,
         out_freq,
-        out_time_fmt,
         out_df,
         sel_idxs,
         stn_id_str)
@@ -313,7 +308,6 @@ def write_updt_year_months(
         lock,
         nc_calendar,
         out_freq,
-        out_time_fmt,
         stn_id_str):
 
     years = np.unique(out_df.index.year)
@@ -343,7 +337,6 @@ def write_updt_year_months(
                     nc_calendar,
                     nc_units,
                     out_freq,
-                    out_time_fmt,
                     out_df,
                     sel_idxs,
                     stn_id_str)
@@ -367,7 +360,6 @@ def write_updt_year_months(
                 nc_calendar,
                 nc_units,
                 out_freq,
-                out_time_fmt,
                 out_df,
                 sel_idxs,
                 stn_id_str)
@@ -389,7 +381,6 @@ def reformat_and_save(args):
      time_fmts,
      out_dir,
      nan_vals,
-     out_time_fmt,
      nc_calendar,
      out_freq,
      lock,
@@ -523,7 +514,6 @@ def reformat_and_save(args):
                 lock,
                 nc_calendar,
                 out_freq,
-                out_time_fmt,
                 stn_id_str)
 
         assert stn_file_ctr > 0, 'No file present in this directory!'
@@ -573,12 +563,12 @@ def main():
 
     nan_vals = [-999]
 
-    out_time_fmt = '%Y%m%d%H%M'
-
     nc_calendar = 'gregorian'
 
+    # Can have days, hours, minutes only.
     out_freq = 'min'
 
+    # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'months'
 
     out_dir = Path(f'reformatted_binary/historical/monthly')
@@ -606,7 +596,6 @@ def main():
              time_fmts,
              out_dir,
              nan_vals,
-             out_time_fmt,
              nc_calendar,
              out_freq,
              lock,
@@ -629,7 +618,6 @@ def main():
          time_fmts,
          out_dir,
          nan_vals,
-         out_time_fmt,
          nc_calendar,
          out_freq,
          lock,

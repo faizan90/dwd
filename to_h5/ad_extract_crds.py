@@ -203,12 +203,12 @@ def check_and_get_valid_column(raw_df_cols, chk_cols, label):
 
 def main():
 
-    main_dir = Path(r'E:\dwd_meteo')
+    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
     os.chdir(main_dir)
 
-    in_dir = Path(r'extracted/hist_hourly_temp')
+    in_dir = Path(r'extracted\metadata_ppt')
 
-    out_data_col_pref = 'T'
+    out_data_col_pref = 'P'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -225,6 +225,8 @@ def main():
 
     file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
 
+    dir_name_patt = 'Meta_Daten_ein_min_rr*'
+
     seps = [';']
 
     time_fmts = ['%Y%m%d']
@@ -237,11 +239,11 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds')
+    out_dir = Path(f'crds/geo_crds_ppt')
 
-    out_dir.mkdir(exist_ok=True)
+    out_dir.mkdir(exist_ok=True, parents=True)
 
-    all_stn_dirs = list(in_dir.glob('./stundenwerte*'))
+    all_stn_dirs = list(in_dir.glob(f'./{dir_name_patt}'))
 
     assert all_stn_dirs, 'No directories selected!'
 
