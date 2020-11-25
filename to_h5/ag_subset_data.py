@@ -101,7 +101,7 @@ def initiate_output(in_h5_hdl, beg_time, end_time, out_h5_path):
         dates_times.to_pydatetime(), nc_units, nc_calendar)
 
     time_nums_ds = time_grp.create_dataset(
-        'time', (dates_times.shape[0],), dtype=np.int64)
+        'time', (dates_times.shape[0],), dtype=np.float64)
 
     time_nums_ds[:] = dates_times_nums
 
