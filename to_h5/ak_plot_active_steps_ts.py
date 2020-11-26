@@ -1,9 +1,9 @@
 '''
 @author: Faizan-Uni-Stuttgart
 
-Nov 25, 2020
+24 Feb 2020
 
-7:48:49 PM
+21:36:56
 
 '''
 import os
@@ -21,25 +21,23 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
+    main_dir = Path(
+        r'P:\dwd_meteo\1_minute\precipitation')
+
     os.chdir(main_dir)
 
-    # .csv and .pkl allowed as extensions.
-    in_df_path = Path('resampled_dfs/neckar_1min_ppt_data_20km_buff_Y2017__RRD_RTsum.pkl')
+    # .csv and .pkl allowed only.
+    in_df_path = Path(r'merged_dfs/neckar_1min_ppt_data_20km_buff_Y2017.pkl')
 
-    # in case of .csv
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
 
-    # Plot params
-    fig_size = (10, 5)
+    out_dir = Path('active_time_steps_counts_sers')
+
+    fig_size_long = (18, 8)
     dpi = 200
-
-    xlabel = 'Time (Day)'
-    ylabel = 'Precipitation (mm)'
-
-    # Outputs' directory
-    out_dir = Path('ts_figs__ppt_1day')
+    xlabel = 'Time (minute)'
+    ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -53,23 +51,27 @@ def main():
     else:
         raise NotImplementedError(f'Unknown extension: {in_df_path.suffix}!')
 
-    for column in df:
-        print(f'Plotting column: {column}...')
-        plt.figure(figsize=fig_size)
+    avail_nrst_stns_ser = df.count(axis=1)
 
-        plt.plot(df.index, df[column], alpha=0.7)
+    assert avail_nrst_stns_ser.sum() > 0, 'in_var_df is empty!'
 
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
+    plt.figure(figsize=fig_size_long)
 
-        plt.grid()
-        plt.gca().set_axisbelow(True)
+    plt.plot(
+        avail_nrst_stns_ser.index,
+        avail_nrst_stns_ser.values,
+        alpha=0.8)
 
-        out_fig_name = f'{in_df_path.stem}_{column}.png'
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
-        plt.savefig(str(out_dir / out_fig_name), bbox_inches='tight', dpi=dpi)
+    plt.grid()
+    plt.gca().set_axisbelow(True)
 
-        plt.close()
+    plt.savefig(
+        out_dir / f'{in_df_path.stem}.png', dpi=dpi, bbox_inches='tight')
+
+    plt.close()
 
     return
 

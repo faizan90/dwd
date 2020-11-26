@@ -572,9 +572,9 @@ def main():
     out_freq = 'min'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
-    sep_basis = 'months'
+    sep_basis = 'years'
 
-    out_dir = Path(f'reformatted_binary/historical/monthly')
+    out_dir = Path(f'hdf5_dss/historical/annual')
 
     n_cpus = 8
 

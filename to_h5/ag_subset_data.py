@@ -45,6 +45,7 @@ def get_h5_units_calendar_freq(h5_hdl):
 
     nc_units = time_grp.attrs['units']
     nc_calendar = time_grp.attrs['calendar']
+    nc_time_fmt = time_grp.attrs['str_fmt']
 
     resolution = nc_units.split(' ')[0]
 
@@ -60,7 +61,7 @@ def get_h5_units_calendar_freq(h5_hdl):
     else:
         raise NotImplementedError('Unknown resolution: {resolution}!')
 
-    return nc_units, nc_calendar, freq
+    return nc_units, nc_calendar, freq, nc_time_fmt
 
 
 def get_h5_dates_times(h5_hdl, nc_units, nc_calendar):
@@ -73,7 +74,10 @@ def get_h5_dates_times(h5_hdl, nc_units, nc_calendar):
 
 def initiate_output(in_h5_hdl, beg_time, end_time, out_h5_path):
 
-    nc_units, nc_calendar, freq = get_h5_units_calendar_freq(in_h5_hdl)
+    (nc_units,
+     nc_calendar,
+     freq,
+     nc_time_fmt) = get_h5_units_calendar_freq(in_h5_hdl)
 
     h5_hdl = h5py.File(str(out_h5_path), mode='w', driver=None)
 
@@ -81,12 +85,13 @@ def initiate_output(in_h5_hdl, beg_time, end_time, out_h5_path):
 
     time_grp.attrs['units'] = nc_units
     time_grp.attrs['calendar'] = nc_calendar
+    time_grp.attrs['str_fmt'] = nc_time_fmt
 
     dates_times = pd.date_range(beg_time, end_time, freq=freq)
 
     n_steps = dates_times.shape[0]
 
-    dates_times_strs = dates_times.strftime('%Y%m%d%H%M')
+    dates_times_strs = dates_times.strftime(nc_time_fmt)
 
     h5_str_dt = h5py.special_dtype(vlen=str)
 
@@ -212,7 +217,7 @@ def subset_data(args):
 
                 (out_nc_units,
                  out_nc_calendar,
-                 _) = get_h5_units_calendar_freq(out_h5_hdl)
+                ) = get_h5_units_calendar_freq(out_h5_hdl)[:2]
 
                 reindex_dates_times = get_h5_dates_times(
                     out_h5_hdl, out_nc_units, out_nc_calendar)
@@ -223,7 +228,7 @@ def subset_data(args):
 
         (in_nc_units,
          in_nc_calendar,
-         _) = get_h5_units_calendar_freq(in_h5_hdl)
+        ) = get_h5_units_calendar_freq(in_h5_hdl)[:2]
 
         in_dates_times = get_h5_dates_times(
             in_h5_hdl, in_nc_units, in_nc_calendar)
@@ -258,7 +263,7 @@ def main():
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'reformatted_binary\historical\monthly')]
+        Path(r'hdf5_dss\historical\annual')]
 
     data_name_patts = [
         'P_Y{year:4d}M{month:2d}.h5',
@@ -280,7 +285,7 @@ def main():
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'reformatted_merged_h5/neckar_1min_ppt_data_20km_buff_Y2018.h5')
+        r'merged_h5s/neckar_1min_ppt_data_20km_buff_Y2017.h5')
 
     overwrite_output_flag = True
 
