@@ -103,7 +103,7 @@ def initiate_output(in_h5_hdl, beg_time, end_time, out_h5_path):
     del dates_times_strs
 
     dates_times_nums = date2num(
-        dates_times.to_pydatetime(), nc_units, nc_calendar)
+        dates_times.to_pydatetime(), nc_units, nc_calendar).astype(int)
 
     time_nums_ds = time_grp.create_dataset(
         'time', (dates_times.shape[0],), dtype=np.float64)
@@ -259,19 +259,19 @@ def subset_data(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5_dss\historical\annual')]
+        Path(r'hdf5_dss\annual_tem')]
 
     data_name_patts = [
-        'P_Y{year:4d}M{month:2d}.h5',
-        'P_Y{year:4d}.h5']
+        'T_Y{year:4d}M{month:2d}.h5',
+        'T_Y{year:4d}.h5']
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\neckar_1min_ppt_data_20km_buff\metadata_ppt_gkz3_crds.csv')
+        r'crds\rheinlandpfalz_1hr_tem_data_20km_buff\extracted_gkz3_crds.csv')
 
     sep = ';'
 
@@ -279,13 +279,13 @@ def main():
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '2017-01-01 00:00:00'
-    end_time = '2017-12-31 23:59:59'
+    beg_time = '2009-01-01 00:00:00'
+    end_time = '2020-12-31 23:00:00'
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'merged_h5s/neckar_1min_ppt_data_20km_buff_Y2017.h5')
+        r'merged_h5s/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.h5')
 
     overwrite_output_flag = True
 

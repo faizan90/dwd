@@ -21,11 +21,11 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     # .csv and .pkl allowed as extensions.
-    in_df_path = Path('resampled_dfs/neckar_1min_ppt_data_20km_buff_Y2017__RRD_RTsum.pkl')
+    in_df_path = Path('resampled_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020__RRD_RTmean.pkl')
 
     # in case of .csv
     sep = ';'
@@ -39,7 +39,7 @@ def main():
     ylabel = 'Precipitation (mm)'
 
     # Outputs' directory
-    out_dir = Path('ts_figs__ppt_1day')
+    out_dir = Path('ts_figs__tem_1day_rheinlandpfalz_mean')
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

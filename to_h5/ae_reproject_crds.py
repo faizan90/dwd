@@ -19,11 +19,11 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation\crds')
+    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
     os.chdir(main_dir)
 
-    in_file = Path(r'geo_crds_ppt/metadata_ppt_geo_crds.csv')
-    out_file = Path(f'gkz3_crds_ppt/metadata_ppt_gkz3_crds.csv')
+    in_file = Path(r'geo_crds_tem/extracted_geo_crds.csv')
+    out_file = Path(f'gkz3_crds_tem/extracted_gkz3_crds.csv')
 
     sep = ';'
 

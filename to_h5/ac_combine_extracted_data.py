@@ -63,10 +63,16 @@ def get_nc_units_and_times(resolution, year, beg_month, end_month):
     end_n_days = monthrange(year, end_month)[1]
 
     beg_time = f'{year:04d}-{beg_month:02d}-01 00:00:00'
-    end_time = f'{year:04d}-{end_month:02d}-{end_n_days} 23:59:59'
+    end_time = f'{year:04d}-{end_month:02d}-{end_n_days}'
 
-    if resolution in ('days', 'hours', 'minutes', 'seconds'):
-        pass
+    if resolution == 'days':
+        end_time = f'{end_time} 00:00:00'
+
+    elif resolution == 'hours':
+        end_time = f'{end_time} 23:00:00'
+
+    elif resolution == 'minutes':
+        end_time = f'{end_time} 23:59:00'
 
     else:
         raise NotImplementedError(f'Invalid resolution: {resolution}!')
@@ -160,15 +166,12 @@ def validate_h5_file(
     n_steps = 0
 
     if 'time' in h5_hdl:
-        assert h5_hdl['time/time'][+0] == int(date2num(
+        assert h5_hdl['time/time'][+0] == date2num(
             pd.to_datetime(beg_time, format='%Y-%m-%d %H:%M:%S'),
             nc_units,
-            nc_calendar))
+            nc_calendar)
 
-        assert h5_hdl['time/time'][-1] == int(date2num(
-            pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S'),
-            nc_units,
-            nc_calendar))
+        assert h5_hdl['time/time'][-1] == date2num(pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S'), nc_units, nc_calendar)
 
         assert 'time/time_strs' in h5_hdl
 
@@ -238,7 +241,9 @@ def write_updt_h5_file(
     date2nums_idxs = date2num(
         out_df.index[sel_idxs].to_pydatetime(),
         nc_units,
-        nc_calendar)
+        nc_calendar).astype(int)
+
+    assert np.all(date2nums_idxs >= 0)
 
     if 'data' in h5_hdl:
         data_grp = h5_hdl['data']
@@ -526,7 +531,7 @@ def reformat_and_save(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     # DATA_TXT_PREF might need changing based on dataset.
@@ -539,14 +544,15 @@ def main():
     # One of these should be in the file.
 
     # Precip
-    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
-    out_data_col_pref = 'P'
+#     data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
+#     out_data_col_pref = 'P'
 
     # Temp
-#     data_cols = ['LUFTTEMPERATUR', 'TT_TU']
-#     out_data_col_pref = 'T'
+    data_cols = ['LUFTTEMPERATUR', 'TT_TU']
+    out_data_col_pref = 'T'
 
-    match_patt = '*/1minutenwerte_nieder_*'
+    # match_patt = '*/1minutenwerte_nieder_*' # minute
+    match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -555,28 +561,31 @@ def main():
     # Values within a given interval, get the same value as the interval
     # end time. Please check if this should be the case. Otherwise, change code
     # accordingly.
-    interval_vals_flag = True
+    interval_vals_flag = False
 
-    time_cols = ['MESS_DATUM_BEGINN', 'MESS_DATUM_ENDE']
+#     time_cols = ['MESS_DATUM_BEGINN', 'MESS_DATUM_ENDE']  # minute
+    time_cols = ['MESS_DATUM']  # hourly
+
     stn_cols = ['STATIONS_ID']
 
     seps = [';']
 
-    time_fmts = ['%Y%m%d%H%M']
+#     time_fmts = ['%Y%m%d%H%M']  # minute
+    time_fmts = ['%Y%m%d%H']  # hourly
 
     nan_vals = [-999]
 
     nc_calendar = 'gregorian'
 
-    # Can be days, hours, minutes only.
-    out_freq = 'min'
+    # Can be D, H, min, or T only.
+    out_freq = 'H'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'years'
 
-    out_dir = Path(f'hdf5_dss/historical/annual')
+    out_dir = Path(f'hdf5_dss/annual_tem')
 
-    n_cpus = 8
+    n_cpus = 14
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

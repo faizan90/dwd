@@ -15,7 +15,7 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 
 def ret_mp_idxs(n_vals, n_cpus):
@@ -203,12 +203,12 @@ def check_and_get_valid_column(raw_df_cols, chk_cols, label):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\1_minute\precipitation')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
-    in_dir = Path(r'extracted\metadata_ppt')
+    in_dir = Path(r'extracted')
 
-    out_data_col_pref = 'P'
+    out_data_col_pref = 'T'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -225,7 +225,8 @@ def main():
 
     file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
 
-    dir_name_patt = 'Meta_Daten_ein_min_rr*'
+    # Can go in to dirs by having a slash.
+    dir_name_patt = '*hourly_temp/stundenwerte_TU*'
 
     seps = [';']
 
@@ -239,7 +240,7 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds_ppt')
+    out_dir = Path(f'crds/geo_crds_tem')
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

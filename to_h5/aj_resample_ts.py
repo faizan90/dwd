@@ -19,12 +19,12 @@ DEBUG_FLAG = True
 def main():
 
     main_dir = Path(
-        r'P:\dwd_meteo\1_minute\precipitation')
+        r'P:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'merged_dfs/neckar_1min_ppt_data_20km_buff_Y2017.pkl')
+    in_df_path = Path(r'merged_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -38,9 +38,9 @@ def main():
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled show have a min-count to get a non Na value.
     # This is because resample sum does not have a skipna flag.
-    resample_ress = ['5min', 'D']
-    min_counts = [5, 1440]
-    resample_types = ['sum']
+    resample_ress = ['D']
+    min_counts = [24]
+    resample_types = ['mean', 'min', 'max']
 
     assert out_fmt in ('.csv', '.pkl')
 
@@ -60,10 +60,15 @@ def main():
             f'Unknown file extension: {in_df_path.suffix}!')
 
     for resample_res, min_count in zip(resample_ress, min_counts):
+
+        counts_df = in_df.resample(resample_res).count().astype(float)
+        counts_df[counts_df < min_count] = float('nan')
+
         for resample_type in resample_types:
-            resample_df = getattr(
-                in_df.resample(resample_res),
-                resample_type)(min_count=min_count)
+
+            resample_df = getattr(in_df.resample(resample_res), resample_type)()
+
+            resample_df *= counts_df
 
             # Another, very slow, way of doing this.
 #             resample_df = in_df.resample(resample_res).agg(

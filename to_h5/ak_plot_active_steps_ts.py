@@ -22,12 +22,12 @@ DEBUG_FLAG = True
 def main():
 
     main_dir = Path(
-        r'P:\dwd_meteo\1_minute\precipitation')
+        r'P:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed only.
-    in_df_path = Path(r'merged_dfs/neckar_1min_ppt_data_20km_buff_Y2017.pkl')
+    in_df_path = Path(r'resampled_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020__RRD_RTmax.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -36,7 +36,7 @@ def main():
 
     fig_size_long = (18, 8)
     dpi = 200
-    xlabel = 'Time (minute)'
+    xlabel = 'Time (day)'
     ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)
@@ -53,7 +53,7 @@ def main():
 
     avail_nrst_stns_ser = df.count(axis=1)
 
-    assert avail_nrst_stns_ser.sum() > 0, 'in_var_df is empty!'
+    assert avail_nrst_stns_ser.sum() > 0, 'df is empty!'
 
     plt.figure(figsize=fig_size_long)
 
