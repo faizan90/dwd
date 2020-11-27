@@ -25,9 +25,9 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed as extensions.
-    in_df_path = Path('dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.pkl')
+    in_df_path = Path('dfs__resampled/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020__RRD_RTmin.pkl')
 
-    # in case of .csv
+    # In case of .csv
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
 
@@ -35,11 +35,11 @@ def main():
     fig_size = (10, 5)
     dpi = 200
 
-    xlabel = 'Time (hour)'
-    ylabel = 'Temperature (C)'
+    xlabel = ''
+    ylabel = ''
 
     # Outputs' directory
-    out_dir = Path('figs__ts/ts_figs__tem_1hr_neckar')
+    out_dir = Path('figs__ts/tem_min_1day_rheinlandpfalz')
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

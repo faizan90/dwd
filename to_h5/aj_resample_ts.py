@@ -18,13 +18,12 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(
-        r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'merged_dfs/rheinlandpfalz_1hr_ppt_data_20km_buff_Y2009_2020.pkl')
+    in_df_path = Path(r'dfs__merged_subset/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -33,7 +32,7 @@ def main():
     # Can be .pkl or .csv.
     out_fmt = '.pkl'
 
-    out_dir = Path(r'resampled_dfs')
+    out_dir = Path(r'dfs__resampled')
 
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled show have a min-count to get a non Na value.
@@ -63,6 +62,9 @@ def main():
 
         counts_df = in_df.resample(resample_res).count().astype(float)
         counts_df[counts_df < min_count] = float('nan')
+        counts_df[counts_df >= min_count] = 1.0
+
+        assert counts_df.max().max() <= 1.0
 
         for resample_type in resample_types:
 

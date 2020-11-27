@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 from netCDF4 import date2num
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 MSGS_FLAG = True
 
@@ -531,12 +531,12 @@ def reformat_and_save(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\minute\precipitation')
     os.chdir(main_dir)
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'extracted')
+    in_dir = Path(r'txt__raw_dwd_data/recent')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -544,15 +544,15 @@ def main():
     # One of these should be in the file.
 
     # Precip
-#     data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
-#     out_data_col_pref = 'P'
+    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
+    out_data_col_pref = 'P'
 
     # Temp
-    data_cols = ['LUFTTEMPERATUR', 'TT_TU']
-    out_data_col_pref = 'T'
+#     data_cols = ['LUFTTEMPERATUR', 'TT_TU']
+#     out_data_col_pref = 'T'
 
-    # match_patt = '*/1minutenwerte_nieder_*' # minute
-    match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+    match_patt = '1minutenwerte_nieder_*'  # minute
+#     match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -564,26 +564,26 @@ def main():
     interval_vals_flag = False
 
 #     time_cols = ['MESS_DATUM_BEGINN', 'MESS_DATUM_ENDE']  # minute
-    time_cols = ['MESS_DATUM']  # hourly
+    time_cols = ['MESS_DATUM']  # hourly, minute
 
     stn_cols = ['STATIONS_ID']
 
     seps = [';']
 
-#     time_fmts = ['%Y%m%d%H%M']  # minute
-    time_fmts = ['%Y%m%d%H']  # hourly
+    time_fmts = ['%Y%m%d%H%M']  # minute
+#     time_fmts = ['%Y%m%d%H']  # hourly
 
     nan_vals = [-999]
 
     nc_calendar = 'gregorian'
 
     # Can be D, H, min, or T only.
-    out_freq = 'H'
+    out_freq = 'min'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
-    sep_basis = 'years'
+    sep_basis = 'months'
 
-    out_dir = Path(f'hdf5_dss/annual_tem')
+    out_dir = Path(f'hdf5__all_dss/historical/monthly')
 
     n_cpus = 14
 

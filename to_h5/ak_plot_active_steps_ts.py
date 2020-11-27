@@ -21,13 +21,12 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(
-        r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\minute\precipitation')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed only.
-    in_df_path = Path(r'dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.pkl')
+    in_df_path = Path(r'dfs__resampled/neckar_1min_ppt_data_20km_buff_Y2009__RRH_RTsum.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'

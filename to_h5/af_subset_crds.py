@@ -35,11 +35,11 @@ def get_stns_in_cat(crds_df, poly):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'P:\dwd_meteo\minute\precipitation\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3_crds_tem/extracted_gkz3_crds.csv')
+    in_crds_file = Path(r'gkz3_crds_ppt/metadata_ppt_gkz3_crds.csv')
 
     sep = ';'
 
@@ -48,7 +48,7 @@ def main():
 
     shp_buff_dist = 20000
 
-    out_dir = Path(r'neckar_1hr_tem_data_20km_buff')
+    out_dir = Path(r'neckar_1min_ppt_data_20km_buff')
 
     print('Reading inputs...')
 
