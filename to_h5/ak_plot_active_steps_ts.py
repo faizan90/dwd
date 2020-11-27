@@ -27,16 +27,16 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed only.
-    in_df_path = Path(r'resampled_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020__RRD_RTmax.pkl')
+    in_df_path = Path(r'dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
 
-    out_dir = Path('active_time_steps_counts_sers')
+    out_dir = Path('figs__active_time')
 
     fig_size_long = (18, 8)
     dpi = 200
-    xlabel = 'Time (day)'
+    xlabel = 'Time (hour)'
     ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)

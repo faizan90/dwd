@@ -263,7 +263,7 @@ def main():
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5_dss\annual_tem')]
+        Path(r'hdf5__all_dss\annual_tem')]
 
     data_name_patts = [
         'T_Y{year:4d}M{month:2d}.h5',
@@ -271,7 +271,7 @@ def main():
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\rheinlandpfalz_1hr_tem_data_20km_buff\extracted_gkz3_crds.csv')
+        r'crds\neckar_1hr_tem_data_20km_buff\extracted_gkz3_crds.csv')
 
     sep = ';'
 
@@ -279,13 +279,13 @@ def main():
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '2009-01-01 00:00:00'
+    beg_time = '2005-01-01 00:00:00'
     end_time = '2020-12-31 23:00:00'
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'merged_h5s/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.h5')
+        r'hdf5__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.h5')
 
     overwrite_output_flag = True
 

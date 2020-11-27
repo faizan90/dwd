@@ -24,7 +24,7 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'merged_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.pkl')
+    in_df_path = Path(r'merged_dfs/rheinlandpfalz_1hr_ppt_data_20km_buff_Y2009_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'

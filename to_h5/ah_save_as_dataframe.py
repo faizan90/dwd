@@ -23,13 +23,13 @@ def main():
     os.chdir(main_dir)
 
     h5_path = Path(
-        r'merged_h5s/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.h5')
+        r'hdf5__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.h5')
 
     # Two extensions allowed: .csv and .pkl.
     # csv: text dump, pkl: dataframe as pickle dump.
     # An error otherwise.
     out_df_path = Path(
-        r'merged_dfs/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.pkl')
+        r'dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2005_2020.pkl')
 
     # In case of .csv format.
     float_fmt = '%0.3f'

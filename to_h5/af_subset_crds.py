@@ -44,11 +44,11 @@ def main():
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\DWD_meteo_hist_pres\shp\RP_GKZ3.shp')
+        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds_all.shp')
 
     shp_buff_dist = 20000
 
-    out_dir = Path(r'rheinlandpfalz_1hr_tem_data_20km_buff')
+    out_dir = Path(r'neckar_1hr_tem_data_20km_buff')
 
     print('Reading inputs...')
 
