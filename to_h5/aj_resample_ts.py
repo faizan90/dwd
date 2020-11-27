@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pandas as pd
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020.pkl')
+    in_df_path = Path(r'dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2004_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'

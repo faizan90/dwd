@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 plt.ioff()
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed as extensions.
-    in_df_path = Path('dfs__resampled/rheinlandpfalz_1hr_tem_data_20km_buff_Y2009_2020__RRD_RTmin.pkl')
+    in_df_path = Path('dfs__resampled/neckar_1hr_tem_data_20km_buff_Y2004_2020__RRD_RTmean.pkl')
 
     # In case of .csv
     sep = ';'
@@ -39,7 +39,7 @@ def main():
     ylabel = ''
 
     # Outputs' directory
-    out_dir = Path('figs__ts/tem_min_1day_rheinlandpfalz')
+    out_dir = Path('figs__ts/tem_mean_1day_neckar')
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
