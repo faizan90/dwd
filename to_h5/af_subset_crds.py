@@ -39,16 +39,16 @@ def main():
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3_crds_ppt/extracted_gkz3_crds.csv')
+    in_crds_file = Path(r'gkz3_crds_tem/extracted_gkz3_crds.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds_all.shp')
+        r'P:\Synchronize\IWS\DWD_meteo_hist_pres\shp\BW.shp')
 
     shp_buff_dist = 20000
 
-    out_dir = Path(r'neckar_1hr_ppt_data_20km_buff')
+    out_dir = Path(r'baden_wuerttemberg_1hr_tem_20km_buff')
 
     print('Reading inputs...')
 

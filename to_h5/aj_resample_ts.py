@@ -23,7 +23,7 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset/neckar_1hr_tem_data_20km_buff_Y2004_2020.pkl')
+    in_df_path = Path(r'dfs__merged_subset/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -40,6 +40,7 @@ def main():
     resample_ress = ['D']
     min_counts = [24]
     resample_types = ['mean', 'min', 'max']
+#     resample_types = ['sum']
 
     assert out_fmt in ('.csv', '.pkl')
 

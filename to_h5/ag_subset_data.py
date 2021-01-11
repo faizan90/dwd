@@ -284,7 +284,7 @@ def main():
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\neckar_1hr_tem_data_20km_buff\extracted_gkz3_crds.csv')
+        r'crds\baden_wuerttemberg_1hr_tem_20km_buff\extracted_gkz3_crds.csv')
 
     sep = ';'
 
@@ -298,7 +298,7 @@ def main():
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'hdf5__merged_subset/neckar_1hr_tem_data_20km_buff_Y2004_2020.h5')
+        r'hdf5__merged_subset/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020.h5')
 
     overwrite_output_flag = True
 

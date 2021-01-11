@@ -27,7 +27,7 @@ def main():
 
     # .csv and .pkl allowed only.
     in_df_path = Path(
-        r'dfs__resampled/neckar_1hr_tem_data_20km_buff_Y2004_2020__RRD_RTmean.pkl')
+        r'dfs__resampled/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020__RRD_RTmean.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -36,7 +36,7 @@ def main():
 
     fig_size_long = (18, 8)
     dpi = 200
-    xlabel = 'Time (hour)'
+    xlabel = 'Time (day)'
     ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)
@@ -58,7 +58,7 @@ def main():
     plt.figure(figsize=fig_size_long)
 
     plt.plot(
-        avail_nrst_stns_ser.index,
+        avail_nrst_stns_ser.index.values,
         avail_nrst_stns_ser.values,
         alpha=0.8)
 

@@ -25,7 +25,7 @@ def main():
     os.chdir(main_dir)
 
     # .csv and .pkl allowed as extensions.
-    in_df_path = Path('dfs__resampled/neckar_1hr_tem_data_20km_buff_Y2004_2020__RRD_RTmean.pkl')
+    in_df_path = Path('dfs__resampled/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020__RRD_RTmean.pkl')
 
     # In case of .csv
     sep = ';'
@@ -39,7 +39,7 @@ def main():
     ylabel = ''
 
     # Outputs' directory
-    out_dir = Path('figs__ts/tem_mean_1day_neckar')
+    out_dir = Path('figs__ts/tem_mean_1day_baden_wuerttemberg')
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -57,7 +57,7 @@ def main():
         print(f'Plotting column: {column}...')
         plt.figure(figsize=fig_size)
 
-        plt.plot(df.index, df[column], alpha=0.7)
+        plt.plot(df.index.values, df[column].values, alpha=0.7)
 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
