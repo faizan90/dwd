@@ -11,7 +11,7 @@ import time
 import timeit
 from pathlib import Path
 
-import ogr
+from osgeo import ogr
 import pandas as pd
 
 DEBUG_FLAG = True
