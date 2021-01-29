@@ -19,11 +19,11 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'P:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
-    in_file = Path(r'geo_crds_tem/extracted_geo_crds.csv')
-    out_file = Path(f'gkz3_crds_tem/extracted_gkz3_crds.csv')
+    in_file = Path(r'geo_crds_ppt/daily_ppt_geo_crds.csv')
+    out_file = Path(f'gkz3_crds_ppt/daily_ppt_gkz3_crds.csv')
 
     sep = ';'
 
@@ -51,7 +51,8 @@ def main():
         parse_dates=False,
         index_col=0,
         dtype=object,
-        skipinitialspace=True)
+        skipinitialspace=True,
+        encoding='ISO-8859-1')
 
     print('Input shape:', in_crds_df.shape)
 

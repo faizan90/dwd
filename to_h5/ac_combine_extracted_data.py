@@ -434,8 +434,20 @@ def reformat_and_save(args):
 
             assert sep_flag, 'Could not read with the given separators!'
 
-            assert raw_df.shape[0], 'No data!'
-            assert raw_df.shape[1] >= 3, 'Not enough columns!'
+            if not raw_df.shape[0]:
+                print('No data for file:', stn_file)
+                continue
+
+#             assert raw_df.shape[0], 'No data!'
+
+            if not (raw_df.shape[1] >= 3):
+                print('Not enough columns for file:', stn_file)
+                continue
+
+#             assert raw_df.shape[1] >= 3, 'Not enough columns!'
+
+#             # For debugging.
+#             print('Reading:', stn_file)
 
             raw_df.columns = [
                 str(col).strip().upper() for col in raw_df.columns]
@@ -474,7 +486,7 @@ def reformat_and_save(args):
 
             assert out_df.shape[1] == 1, 'More than one data_col!'
 
-            out_df = out_df.loc[take_steps, :]
+            out_df = out_df.loc[take_steps,:]
 
             out_df.replace(nan_vals, float('nan'), inplace=True)
 
@@ -501,7 +513,7 @@ def reformat_and_save(args):
             if not isinstance(out_df.index, pd.DatetimeIndex):
                 updt_df_index(out_df, time_fmts)
 
-            out_df = out_df.iloc[~out_df.index.duplicated('first'), :]
+            out_df = out_df.iloc[~out_df.index.duplicated('first'),:]
 
             if time_reindex is not None:
                 out_df = out_df.reindex(time_reindex)
@@ -531,12 +543,12 @@ def reformat_and_save(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\minute\precipitation')
+    main_dir = Path(r'P:\dwd_meteo\daily')
     os.chdir(main_dir)
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'txt__raw_dwd_data/recent')
+    in_dir = Path(r'txt__raw_dwd_data/pres_daily_more_precip')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -544,15 +556,18 @@ def main():
     # One of these should be in the file.
 
     # Precip
-    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE']
+    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS']
     out_data_col_pref = 'P'
 
     # Temp
 #     data_cols = ['LUFTTEMPERATUR', 'TT_TU']
 #     out_data_col_pref = 'T'
 
-    match_patt = '1minutenwerte_nieder_*'  # minute
+    # Directory names. These have files for each station.
+#     match_patt = '1minutenwerte_nieder_*'  # minute
 #     match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+#     match_patt = 'tageswerte_[0-9]*'  # daily
+    match_patt = 'tageswerte_RR_[0-9]*'  # daily
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -570,22 +585,23 @@ def main():
 
     seps = [';']
 
-    time_fmts = ['%Y%m%d%H%M']  # minute
+#     time_fmts = ['%Y%m%d%H%M']  # minute
 #     time_fmts = ['%Y%m%d%H']  # hourly
+    time_fmts = ['%Y%m%d']  # daily
 
     nan_vals = [-999]
 
     nc_calendar = 'gregorian'
 
     # Can be D, H, min, or T only.
-    out_freq = 'min'
+    out_freq = 'D'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
-    sep_basis = 'months'
+    sep_basis = 'years'
 
-    out_dir = Path(f'hdf5__all_dss/historical/monthly')
+    out_dir = Path(f'hdf5__all_dss/daily_ppt_annual')
 
-    n_cpus = 14
+    n_cpus = 8
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

@@ -90,7 +90,8 @@ def reformat_and_save(args):
                     sep=sep,
                     dtype=object,
                     engine='python',
-                    skipinitialspace=True)
+                    skipinitialspace=True,
+                    encoding='ISO-8859-1')
 
                 if raw_df.shape[1]:
                     sep_flag = True
@@ -98,7 +99,7 @@ def reformat_and_save(args):
 
             assert sep_flag, 'Could not read with the given separators!'
 
-            assert raw_df.shape[0], 'No data!'
+            assert raw_df.shape[0], f'No data for: {stn_file}'
             assert raw_df.shape[1] >= 7, 'Not enough columns!'
 
             raw_df.columns = [
@@ -136,8 +137,7 @@ def reformat_and_save(args):
 
             stn_id = int(stn_id.strip())
 
-            out_df = raw_df.loc[
-                :,
+            out_df = raw_df.loc[:,
                 [stn_id_col,
                  stn_name_col,
                  x_data_col,
@@ -149,7 +149,7 @@ def reformat_and_save(args):
 
             assert out_df.shape[1] == 7, 'More than one data_col!'
 
-            out_df = out_df.loc[take_steps, :]
+            out_df = out_df.loc[take_steps,:]
 
             out_df.index = [f'{out_data_col_pref}{stn_id}'] * out_df.shape[0]
 
@@ -178,7 +178,8 @@ def reformat_and_save(args):
                 sep=out_sep,
                 date_format=out_time_fmt,
                 header=None,
-                line_terminator='\n')
+                line_terminator='\n',
+                encoding='utf-8')
 
             print('Saved:', stn_id)
 
@@ -203,12 +204,12 @@ def check_and_get_valid_column(raw_df_cols, chk_cols, label):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\daily')
     os.chdir(main_dir)
 
-    in_dir = Path(r'extracted')
+    in_dir = Path(r'txt__raw_dwd_data')
 
-    out_data_col_pref = 'T'
+    out_data_col_pref = 'P'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -226,7 +227,7 @@ def main():
     file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
 
     # Can go in to dirs by having a slash.
-    dir_name_patt = '*hourly_temp/stundenwerte_TU*'
+    dir_name_patts = ['*_met/tageswerte_[0-9]*', '*precip/tageswerte_RR_[0-9]*']
 
     seps = [';']
 
@@ -240,11 +241,14 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds_tem')
+    out_dir = Path(f'crds/geo_crds_ppt')
+    out_name = f'daily_ppt_geo_crds.{out_ext}'
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
-    all_stn_dirs = list(in_dir.glob(f'./{dir_name_patt}'))
+    all_stn_dirs = []
+    for dir_name_patt in dir_name_patts:
+        all_stn_dirs.extend(list(in_dir.glob(f'./{dir_name_patt}')))
 
     assert all_stn_dirs, 'No directories selected!'
 
@@ -267,7 +271,7 @@ def main():
              ))
 
     csv_stream.seek(0)
-    with open(out_dir / f'{in_dir.name}_geo_crds.{out_ext}', 'w') as hdl:
+    with open(out_dir / out_name, 'w') as hdl:
         hdl.write(csv_stream.getvalue())
 
 #     pd.read_csv(csv_stream, sep=out_sep, index_col=0, skipinitialspace=True).to_csv(

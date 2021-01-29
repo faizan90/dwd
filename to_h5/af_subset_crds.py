@@ -35,20 +35,20 @@ def get_stns_in_cat(crds_df, poly):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'P:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3_crds_tem/extracted_gkz3_crds.csv')
+    in_crds_file = Path(r'gkz3_crds_ppt/daily_ppt_gkz3_crds.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\DWD_meteo_hist_pres\shp\BW.shp')
+        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds_all.shp')
 
     shp_buff_dist = 20000
 
-    out_dir = Path(r'baden_wuerttemberg_1hr_tem_20km_buff')
+    out_dir = Path(r'neckar_daily_ppt_20km_buff')
 
     print('Reading inputs...')
 
@@ -65,8 +65,12 @@ def main():
     in_crds_df = pd.read_csv(
         in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y']]
 
+    # Remove duplicate, the user can also implement proper selection
+    # because a change station location means a new time series normally.
     keep_crds_stns_steps = ~in_crds_df.index.duplicated(keep='last')
     in_crds_df = in_crds_df.loc[keep_crds_stns_steps]
+
+    in_crds_df.sort_index(inplace=True)
 
     print('Testing containment...')
     contain_crds = get_stns_in_cat(in_crds_df, cat_buff)
