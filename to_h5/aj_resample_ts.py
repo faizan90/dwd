@@ -35,7 +35,7 @@ def main():
     out_dir = Path(r'dfs__resampled')
 
     # min_counts correspond to the resolutions. Each resolution when
-    # being resampled show have a min-count to get a non Na value.
+    # being resampled should have a min-count to get a non Na value.
     # This is because resample sum does not have a skipna flag.
     resample_ress = ['D']
     min_counts = [24]
@@ -85,7 +85,7 @@ def main():
 
             if out_fmt == '.csv':
                 resample_df.to_csv(
-                    out_path, time_format=time_fmt, float_format=float_fmt)
+                    out_path, date_format=time_fmt, float_format=float_fmt)
 
             elif out_fmt == '.pkl':
                 resample_df.to_pickle(out_path)
