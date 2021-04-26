@@ -14,7 +14,7 @@ from pathlib import Path
 from osgeo import ogr
 import pandas as pd
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 
 def get_stns_in_cat(crds_df, poly):
@@ -35,20 +35,20 @@ def get_stns_in_cat(crds_df, poly):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily\crds')
+    main_dir = Path(r'D:\dwd_meteo\hourly\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3_crds_ppt/daily_ppt_gkz3_crds.csv')
+    in_crds_file = Path(r'gkz3_crds_ppt/extracted_gkz3_crds.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds_all.shp')
+        r'P:\Synchronize\IWS\Colleagues_Students\Zulqarnain_Sabir\vector\echaz_4419_gkz3.shp')
 
-    shp_buff_dist = 20000
+    shp_buff_dist = 50000
 
-    out_dir = Path(r'neckar_daily_ppt_20km_buff')
+    out_dir = Path(r'echaz_hourly_ppt_50km_buff')
 
     print('Reading inputs...')
 
@@ -63,7 +63,7 @@ def main():
     assert cat_buff
 
     in_crds_df = pd.read_csv(
-        in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y']]
+        in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y', 'Z']]
 
     # Remove duplicate, the user can also implement proper selection
     # because a change station location means a new time series normally.

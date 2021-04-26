@@ -18,12 +18,12 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'D:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020.pkl')
+    in_df_path = Path(r'dfs__merged_subset/echaz_hourly_ppt_50km_buff_Y2016_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -39,8 +39,8 @@ def main():
     # This is because resample sum does not have a skipna flag.
     resample_ress = ['D']
     min_counts = [24]
-    resample_types = ['mean', 'min', 'max']
-#     resample_types = ['sum']
+#     resample_types = ['mean', 'min', 'max']
+    resample_types = ['sum']
 
     assert out_fmt in ('.csv', '.pkl')
 

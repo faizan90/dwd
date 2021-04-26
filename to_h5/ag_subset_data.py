@@ -67,7 +67,11 @@ def get_h5_units_calendar_freq(h5_hdl):
 def get_h5_dates_times(h5_hdl, nc_units, nc_calendar):
 
     date_times = pd.DatetimeIndex(
-        num2date(h5_hdl['time/time'][:], nc_units, nc_calendar))
+        num2date(
+            h5_hdl['time/time'][:],
+            nc_units,
+            nc_calendar,
+            only_use_cftime_datetimes=False))
 
     return date_times
 
@@ -271,20 +275,20 @@ def subset_data(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'D:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5__all_dss/annual_tem')]
+        Path(r'hdf5__all_dss/annual_ppt')]
 
     data_name_patts = [
 #         'T_Y{year:4d}M{month:2d}.h5',
-        'T_Y{year:4d}.h5'
+        'P_Y{year:4d}.h5'
         ]
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\baden_wuerttemberg_1hr_tem_20km_buff\extracted_gkz3_crds.csv')
+        r'crds\echaz_hourly_ppt_50km_buff\extracted_gkz3_crds.csv')
 
     sep = ';'
 
@@ -292,13 +296,13 @@ def main():
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '2004-01-01 00:00:00'
+    beg_time = '2016-01-01 00:00:00'
     end_time = '2020-12-31 23:00:00'
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'hdf5__merged_subset/baden_wuerttemberg_1hr_tem_data_20km_buff_Y2004_2020.h5')
+        r'hdf5__merged_subset/echaz_hourly_ppt_50km_buff_Y2016_2020.h5')
 
     overwrite_output_flag = True
 
