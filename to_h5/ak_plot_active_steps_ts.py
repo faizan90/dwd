@@ -21,13 +21,13 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'D:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\daily')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed only.
     in_df_path = Path(
-        r'dfs__merged_subset/echaz_hourly_tem_50km_buff_Y2016_2020.pkl')
+        r'dfs__merged_subset\daily_de_tn_Y1961_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -36,7 +36,7 @@ def main():
 
     fig_size_long = (18, 8)
     dpi = 200
-    xlabel = 'Time (hour)'
+    xlabel = 'Time (day)'
     ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)

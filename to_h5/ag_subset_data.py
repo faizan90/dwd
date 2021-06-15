@@ -9,6 +9,7 @@ Nov 25, 2020
 import os
 import time
 import timeit
+import random
 from pathlib import Path
 from multiprocessing import Pool, Manager, Lock
 
@@ -275,35 +276,35 @@ def subset_data(args):
 
 def main():
 
-    main_dir = Path(r'D:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\daily')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5__all_dss/annual_ppt')]
+        Path(r'hdf5__all_dss\daily_tn_annual')]
 
     data_name_patts = [
-#         'T_Y{year:4d}M{month:2d}.h5',
-        'P_Y{year:4d}.h5'
+        'TN_Y{year:4d}.h5'
         ]
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\echaz_hourly_ppt_50km_buff\extracted_gkz3_crds.csv')
+        r'crds\daily_de_buff_100km/daily_tn_epsg32632.csv')
 
     sep = ';'
 
-    n_cpus = 8
+    n_cpus = 4
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '2016-01-01 00:00:00'
-    end_time = '2020-12-31 23:00:00'
+    beg_time = '1961-01-01 00:00:00'
+    end_time = '2020-12-31 23:59:00'
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        r'hdf5__merged_subset/echaz_hourly_ppt_50km_buff_Y2016_2020.h5')
+        f'hdf5__merged_subset/daily_de_tn_Y1961_2020.h5')
 
+    #==========================================================================
     overwrite_output_flag = True
 
     if overwrite_output_flag and out_data_path.exists():
@@ -325,6 +326,8 @@ def main():
     n_cpus = min(n_cpus, n_data_files)
 
     assert data_files, 'No files!'
+
+    random.shuffle(data_files)
 
     if n_cpus == 1:
         lock = Lock()

@@ -18,12 +18,12 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'D:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset/echaz_hourly_ppt_50km_buff_Y2016_2020.pkl')
+    in_df_path = Path(r'dfs__merged_subset/hourly_de_tem_Y1961_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -39,8 +39,11 @@ def main():
     # This is because resample sum does not have a skipna flag.
     resample_ress = ['D']
     min_counts = [24]
-#     resample_types = ['mean', 'min', 'max']
-    resample_types = ['sum']
+    resample_types = ['mean', 'min', 'max']
+#     resample_types = ['sum']
+
+    # Applied to shift the entire time series by this offset.
+    tdelta = pd.Timedelta(0, unit='h')
 
     assert out_fmt in ('.csv', '.pkl')
 
@@ -58,6 +61,8 @@ def main():
     else:
         raise NotImplementedError(
             f'Unknown file extension: {in_df_path.suffix}!')
+
+    in_df.index += tdelta
 
     for resample_res, min_count in zip(resample_ress, min_counts):
 

@@ -22,22 +22,29 @@ def main():
     main_dir = Path(r'P:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
-    in_file = Path(r'geo_crds_ppt/daily_ppt_geo_crds.csv')
-    out_file = Path(f'gkz3_crds_ppt/daily_ppt_gkz3_crds.csv')
+    in_file = Path(r'geo_crds_tem/daily_tn_geo_crds.csv')
 
     sep = ';'
 
     in_epsg = 4326
-    out_epsg = 31467
+    out_epsg = 32632
+
+    out_file = Path(f'utm32n/daily_tn_epsg{out_epsg}.csv')
+
+    out_float_fmt = '%0.0f'
 
     # in_cols and out_cols have one to one correspondence.
     # columns that are in input but not mentioned here stay as they are.
+    #
+    # The order of the first three columns should be longitude, latitude
+    # and altitude.
     in_cols = (
         'GEOGR.LAENGE;GEOGR.BREITE;'
         'STATIONSHOEHE;VON_DATUM;BIS_DATUM').split(';')
 
     out_cols = ['X', 'Y', 'Z', 'BEG_TIME', 'END_TIME']
 
+    #==========================================================================
     assert len(in_cols) == len(out_cols)
 
     out_file.parents[0].mkdir(exist_ok=True, parents=True)
@@ -60,11 +67,11 @@ def main():
         f'EPSG:{in_epsg}', f'EPSG:{out_epsg}', always_xy=True)
 
     out_crds = tfmr.transform(
-        in_crds_df['GEOGR.LAENGE'].values.astype(float),
-        in_crds_df['GEOGR.BREITE'].values.astype(float))
+        in_crds_df[in_cols[0]].values.astype(float),
+        in_crds_df[in_cols[1]].values.astype(float))
 
-    in_crds_df['GEOGR.LAENGE'] = out_crds[0]
-    in_crds_df['GEOGR.BREITE'] = out_crds[1]
+    in_crds_df[in_cols[0]] = out_crds[0]
+    in_crds_df[in_cols[1]] = out_crds[1]
 
     out_cols_all = []
     for col in in_crds_df.columns:
@@ -78,8 +85,7 @@ def main():
 
     in_crds_df.columns = out_cols_all
 
-    in_crds_df.to_csv(out_file, sep=sep, float_format='%0.0f')
-
+    in_crds_df.to_csv(out_file, sep=sep, float_format=out_float_fmt)
     return
 
 

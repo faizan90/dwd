@@ -209,7 +209,7 @@ def main():
 
     in_dir = Path(r'txt__raw_dwd_data')
 
-    out_data_col_pref = 'P'
+    out_data_col_pref = 'TN'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -227,7 +227,17 @@ def main():
     file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
 
     # Can go in to dirs by having a slash.
-    dir_name_patts = ['*_met/tageswerte_[0-9]*', '*precip/tageswerte_RR_[0-9]*']
+
+    # Precipitation.
+#     dir_name_patts = [
+#         '*_met/tageswerte_[0-9]*',
+#         '*_met/tageswerte_KL_[0-9]*',
+#         '*precip/tageswerte_RR_[0-9]*']
+
+    # Temperature.
+    dir_name_patts = [
+        '*_met/tageswerte_[0-9]*',
+        '*_met/tageswerte_KL_[0-9]*']
 
     seps = [';']
 
@@ -241,8 +251,8 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds_ppt')
-    out_name = f'daily_ppt_geo_crds.{out_ext}'
+    out_dir = Path(f'crds/geo_crds_tem')
+    out_name = f'daily_tn_geo_crds.{out_ext}'
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

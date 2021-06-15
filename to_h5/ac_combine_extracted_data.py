@@ -281,10 +281,11 @@ def write_stn_to_h5(
     out_h5_path = out_dir / f'{out_name}.h5'
     out_temp_path = out_dir / f'{out_name}.h5t'
 
+    # Why did I do this? And not with an overall lock only?
     with lock:
         while True:
             if out_temp_path.exists():
-                time.sleep(0.1)
+                time.sleep(1e-5)
 
             else:
                 break
@@ -548,7 +549,7 @@ def main():
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'txt__raw_dwd_data/pres_daily_more_precip')
+    in_dir = Path(r'txt__raw_dwd_data/pres_daily_met')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -556,18 +557,27 @@ def main():
     # One of these should be in the file.
 
     # Precip
-    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS']
-    out_data_col_pref = 'P'
+#     data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS', 'RSK']
+#     out_data_col_pref = 'P'
 
-    # Temp
-#     data_cols = ['LUFTTEMPERATUR', 'TT_TU']
-#     out_data_col_pref = 'T'
+    # Temp mean or hourly.
+#     data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
+#     out_data_col_pref = 'TG'
+
+    # Temp minimum.
+#     data_cols = ['TNK', 'LUFTTEMPERATUR_MINIMUM']
+#     out_data_col_pref = 'TN'
+
+    # Temp maximum.
+    data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
+    out_data_col_pref = 'TX'
 
     # Directory names. These have files for each station.
 #     match_patt = '1minutenwerte_nieder_*'  # minute
 #     match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
 #     match_patt = 'tageswerte_[0-9]*'  # daily
-    match_patt = 'tageswerte_RR_[0-9]*'  # daily
+#     match_patt = 'tageswerte_RR_[0-9]*'  # daily
+    match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -599,7 +609,7 @@ def main():
     # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'years'
 
-    out_dir = Path(f'hdf5__all_dss/daily_ppt_annual')
+    out_dir = Path(f'hdf5__all_dss/daily_tx_annual')
 
     n_cpus = 8
 
@@ -607,9 +617,9 @@ def main():
 
     all_stn_dirs = list(in_dir.glob(f'./{match_patt}'))
 
-    random.shuffle(all_stn_dirs)
-
     assert all_stn_dirs, 'No directories selected!'
+
+    random.shuffle(all_stn_dirs)
 
     if n_cpus == 1:
         lock = Lock()

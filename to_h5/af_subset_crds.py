@@ -11,13 +11,13 @@ import time
 import timeit
 from pathlib import Path
 
-from osgeo import ogr
 import pandas as pd
+from osgeo import ogr
 
 DEBUG_FLAG = False
 
 
-def get_stns_in_cat(crds_df, poly):
+def get_stns_in_poly(crds_df, poly):
 
     contain_stns = []
 
@@ -27,38 +27,88 @@ def get_stns_in_cat(crds_df, poly):
 
         pt = ogr.CreateGeometryFromWkt("POINT (%f %f)" % (float(x), float(y)))
 
+        if pt is None:
+            print(f'Station {stn} returned a Null point!')
+            continue
+
         if poly.Contains(pt):
             contain_stns.append(stn)
 
     return contain_stns
 
 
+def get_merged_poly(in_shp, field='DN', simplify_tol=0):
+
+    '''Merge all polygons with the same ID in the 'field' (from TauDEM)
+
+    Because sometimes there are some polygons from the same catchment,
+    this is problem because there can only one cathcment with one ID,
+    it is an artifact of gdal_polygonize.
+    '''
+
+    cat_ds = ogr.Open(str(in_shp))
+    lyr = cat_ds.GetLayer(0)
+
+    feat_dict = {}
+    fid_to_field_dict = {}
+
+    feat = lyr.GetNextFeature()
+    while feat:
+        fid = feat.GetFID()
+        f_val = feat.GetFieldAsString(field)
+        feat_dict[fid] = feat.Clone()
+        fid_to_field_dict[fid] = f_val
+        feat = lyr.GetNextFeature()
+
+    fid_list = []
+    for fid in list(fid_to_field_dict.keys()):
+        fid_list.append(fid)
+
+    if len(fid_list) > 1:
+        cat_feat = feat_dict[fid_list[0]]
+        merged_cat = cat_feat.GetGeometryRef().Buffer(0)
+        for fid in fid_list[1:]:
+            # The buffer with zero seems to fix invalid geoms somehow.
+            curr_cat_feat = feat_dict[fid].Clone()
+            curr_cat = curr_cat_feat.GetGeometryRef().Buffer(0)
+
+            merged_cat = merged_cat.Union(curr_cat)
+    else:
+        cat = feat_dict[fid_list[0]].Clone()
+        merged_cat = cat.GetGeometryRef().Buffer(0)
+
+    if simplify_tol:
+        merged_cat = merged_cat.Simplify(simplify_tol)
+
+    cat_ds.Destroy()
+    return merged_cat
+
+
 def main():
 
-    main_dir = Path(r'D:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'P:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3_crds_ppt/extracted_gkz3_crds.csv')
+    in_crds_file = Path(r'utm32n/daily_tn_epsg32632.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\Colleagues_Students\Zulqarnain_Sabir\vector\echaz_4419_gkz3.shp')
+        r'P:\Synchronize\IWS\Hydrological_Modeling\data\grdc\de\dem_ansys_taudem\watersheds.shp')
 
-    shp_buff_dist = 50000
+    subset_shp_fld = 'DN'
+    shp_buff_dist = 100000
 
-    out_dir = Path(r'echaz_hourly_ppt_50km_buff')
+    # If zero than no simplification is calculated.
+    simplyify_tol = 90
+
+    out_dir = Path(r'daily_de_buff_100km')
+    #==========================================================================
 
     print('Reading inputs...')
 
-    in_vec = ogr.Open(str(subset_shp_file))
-    in_lyr = in_vec.GetLayer(0)
-    tot_feat_count = in_lyr.GetFeatureCount()
-    assert tot_feat_count == 1, 'Can only have one polygon!'
-
-    cat_feat = (in_lyr.GetFeature(0)).Clone()
-    cat_poly = cat_feat.GetGeometryRef()
+    cat_poly = get_merged_poly(subset_shp_file, subset_shp_fld, simplyify_tol)
     cat_buff = cat_poly.Buffer(shp_buff_dist)
     assert cat_buff
 
@@ -73,7 +123,7 @@ def main():
     in_crds_df.sort_index(inplace=True)
 
     print('Testing containment...')
-    contain_crds = get_stns_in_cat(in_crds_df, cat_buff)
+    contain_crds = get_stns_in_poly(in_crds_df, cat_buff)
 
     subset_crds_stns = in_crds_df.index.intersection(contain_crds)
 
