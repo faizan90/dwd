@@ -23,7 +23,7 @@ def main():
     os.chdir(main_dir)
 
     h5_path = Path(
-        r'hdf5__merged_subset/daily_de_tn_Y1961_2020.h5')
+        r'hdf5__merged_subset/daily_neckar_tg_Y1971_2010.h5')
 
     # Two extensions allowed: .csv and .pkl.
     # csv: text dump, pkl: dataframe as pickle dump.

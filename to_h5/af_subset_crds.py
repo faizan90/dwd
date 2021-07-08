@@ -90,20 +90,20 @@ def main():
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'utm32n/daily_tn_epsg32632.csv')
+    in_crds_file = Path(r'gkz3/daily_ppt_epsg31467.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\Hydrological_Modeling\data\grdc\de\dem_ansys_taudem\watersheds.shp')
+        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds.shp')
 
     subset_shp_fld = 'DN'
-    shp_buff_dist = 100000
+    shp_buff_dist = 0
 
     # If zero than no simplification is calculated.
     simplyify_tol = 90
 
-    out_dir = Path(r'daily_de_buff_100km')
+    out_dir = Path(r'daily_neckar_no_buff')
     #==========================================================================
 
     print('Reading inputs...')

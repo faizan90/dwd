@@ -22,14 +22,14 @@ def main():
     main_dir = Path(r'P:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
-    in_file = Path(r'geo_crds_tem/daily_tn_geo_crds.csv')
+    in_file = Path(r'geo_crds_tem/daily_tg_geo_crds.csv')
 
     sep = ';'
 
     in_epsg = 4326
-    out_epsg = 32632
+    out_epsg = 31467
 
-    out_file = Path(f'utm32n/daily_tn_epsg{out_epsg}.csv')
+    out_file = Path(f'gkz3/daily_tg_epsg{out_epsg}.csv')
 
     out_float_fmt = '%0.0f'
 

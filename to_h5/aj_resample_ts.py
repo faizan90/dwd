@@ -18,12 +18,12 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\daily_de_buff_100km_ppt___merged__daily_hourly_dwd_neg7h__daily_ecad')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset/hourly_de_tem_Y1961_2020.pkl')
+    in_df_path = Path(r'daily_de_ppt_Y1961_2020__merged_data.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -31,16 +31,22 @@ def main():
 
     # Can be .pkl or .csv.
     out_fmt = '.pkl'
+#     out_fmt = '.csv'
 
     out_dir = Path(r'dfs__resampled')
 
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled should have a min-count to get a non Na value.
     # This is because resample sum does not have a skipna flag.
-    resample_ress = ['D']
-    min_counts = [24]
-    resample_types = ['mean', 'min', 'max']
-#     resample_types = ['sum']
+#     resample_ress = ['D']
+#     min_counts = [24]
+
+    # In case of months, the resampling is slightly different than hours etc.
+    resample_ress = ['m']
+    min_counts = [None]
+
+#     resample_types = ['mean']  # , 'min', 'max']
+    resample_types = ['sum']
 
     # Applied to shift the entire time series by this offset.
     tdelta = pd.Timedelta(0, unit='h')
@@ -62,11 +68,22 @@ def main():
         raise NotImplementedError(
             f'Unknown file extension: {in_df_path.suffix}!')
 
+    assert isinstance(in_df.index, pd.DatetimeIndex)
+
     in_df.index += tdelta
 
     for resample_res, min_count in zip(resample_ress, min_counts):
 
         counts_df = in_df.resample(resample_res).count().astype(float)
+
+        if resample_res == 'm':
+            assert min_count is None, 'For months, min_count must be None!'
+
+            min_count = counts_df.index.days_in_month.values.reshape(-1, 1)
+
+        else:
+            pass
+
         counts_df[counts_df < min_count] = float('nan')
         counts_df[counts_df >= min_count] = 1.0
 
@@ -90,7 +107,10 @@ def main():
 
             if out_fmt == '.csv':
                 resample_df.to_csv(
-                    out_path, date_format=time_fmt, float_format=float_fmt)
+                    out_path,
+                    sep=sep,
+                    date_format=time_fmt,
+                    float_format=float_fmt)
 
             elif out_fmt == '.pkl':
                 resample_df.to_pickle(out_path)
