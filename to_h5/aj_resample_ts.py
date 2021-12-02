@@ -57,7 +57,7 @@ def main():
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
-    if in_df_path.suffix == 'csv':
+    if in_df_path.suffix == '.csv':
         in_df = pd.read_csv(in_df_path, sep=sep, index_col=0)
         in_df.index = pd.to_datetime(in_df.index, format=time_fmt)
 
