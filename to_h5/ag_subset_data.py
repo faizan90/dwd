@@ -22,6 +22,102 @@ from netCDF4 import date2num, num2date
 DEBUG_FLAG = False
 
 
+def main():
+
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    os.chdir(main_dir)
+
+    data_dirs = [
+        Path(r'hdf5__all_dss\hourly_rr_annual')]
+
+    data_name_patts = [
+        # 'TX_Y{year:4d}.h5'
+        'P_Y{year:4d}.h5'
+        ]
+
+    # Assuming that it is the output of af_subset_crds.py
+    crds_file = Path(
+        r'crds\hourly_sp7_rr_stns\hourly_rr_epsg31467.csv')
+
+    sep = ';'
+
+    n_cpus = 1
+
+    # Should correspond to the resolution of the input data.
+    # Seconds is the rounding resolution.
+    beg_time = '1995-01-01 00:00:00'
+    end_time = '2021-12-31 23:59:00'
+
+    # The units and calendar are taken from whatever input file came first.
+    # This does not matter as, at the end, the strings are saved anyways.
+    out_data_path = Path(
+        f'hdf5__merged_subset/hourly_sp7_rr_stns.h5')
+
+    overwrite_output_flag = True
+    #==========================================================================
+
+    if overwrite_output_flag and out_data_path.exists():
+        os.remove(out_data_path)
+
+    out_data_path.parents[0].mkdir(exist_ok=True, parents=True)
+
+    crds_df = pd.read_csv(crds_file, sep=sep, index_col=0)
+
+    subset_stns = crds_df.index.tolist()
+
+    data_files = []
+    for data_dir in data_dirs:
+        data_files.extend(list(data_dir.glob('./*.h5')))
+
+    n_data_files = len(data_files)
+    print(f'Found {n_data_files} files to work with.',)
+
+    n_cpus = min(n_cpus, n_data_files)
+
+    assert data_files, 'No files!'
+
+    random.shuffle(data_files)
+
+    if n_cpus == 1:
+        lock = Lock()
+
+        subset_data((
+            data_files,
+            data_name_patts,
+            subset_stns,
+            out_data_path,
+            lock,
+            beg_time,
+            end_time,
+            ))
+
+    else:
+        mp_idxs = ret_mp_idxs(n_data_files, n_cpus)
+
+        lock = Manager().Lock()
+
+        args_gen = ((
+            data_files[mp_idxs[thrd_idx]:mp_idxs[thrd_idx + 1]],
+            data_name_patts,
+            subset_stns,
+            out_data_path,
+            lock,
+            beg_time,
+            end_time,
+            )
+        for thrd_idx in range(n_cpus))
+
+        mp_pool = Pool(n_cpus)
+
+        mp_pool.map(subset_data, args_gen)
+
+        mp_pool.close()
+
+        mp_pool.join()
+
+    return
+
+
 def ret_mp_idxs(n_vals, n_cpus):
 
     assert n_vals > 0
@@ -270,101 +366,6 @@ def subset_data(args):
                     in_h5_hdl)
 
         in_h5_hdl.close()
-
-    return
-
-
-def main():
-
-    main_dir = Path(r'P:\dwd_meteo\daily')
-    os.chdir(main_dir)
-
-    data_dirs = [
-        Path(r'hdf5__all_dss\daily_ppt_annual')]
-
-    data_name_patts = [
-        'P_Y{year:4d}.h5'
-        ]
-
-    # Assuming that it is the output of af_subset_crds.py
-    crds_file = Path(
-        r'crds\daily_neckar_20km_buff/daily_ppt_epsg31467.csv')
-
-    sep = ';'
-
-    n_cpus = 4
-
-    # Should correspond to the resolution of the input data.
-    # Seconds is the rounding resolution.
-    beg_time = '1971-01-01 00:00:00'
-    end_time = '2010-12-31 23:59:00'
-
-    # The units and calendar are taken from whatever input file came first.
-    # This does not matter as, at the end, the strings are saved anyways.
-    out_data_path = Path(
-        f'hdf5__merged_subset/daily_neckar_ppt_Y1971_2010.h5')
-
-    #==========================================================================
-    overwrite_output_flag = True
-
-    if overwrite_output_flag and out_data_path.exists():
-        os.remove(out_data_path)
-
-    out_data_path.parents[0].mkdir(exist_ok=True, parents=True)
-
-    crds_df = pd.read_csv(crds_file, sep=sep, index_col=0)
-
-    subset_stns = crds_df.index.tolist()
-
-    data_files = []
-    for data_dir in data_dirs:
-        data_files.extend(list(data_dir.glob('./*.h5')))
-
-    n_data_files = len(data_files)
-    print(f'Found {n_data_files} files to work with.',)
-
-    n_cpus = min(n_cpus, n_data_files)
-
-    assert data_files, 'No files!'
-
-    random.shuffle(data_files)
-
-    if n_cpus == 1:
-        lock = Lock()
-
-        subset_data((
-            data_files,
-            data_name_patts,
-            subset_stns,
-            out_data_path,
-            lock,
-            beg_time,
-            end_time,
-            ))
-
-    else:
-        mp_idxs = ret_mp_idxs(n_data_files, n_cpus)
-
-        lock = Manager().Lock()
-
-        args_gen = ((
-            data_files[mp_idxs[thrd_idx]:mp_idxs[thrd_idx + 1]],
-            data_name_patts,
-            subset_stns,
-            out_data_path,
-            lock,
-            beg_time,
-            end_time,
-            )
-        for thrd_idx in range(n_cpus))
-
-        mp_pool = Pool(n_cpus)
-
-        mp_pool.map(subset_data, args_gen)
-
-        mp_pool.close()
-
-        mp_pool.join()
 
     return
 

@@ -544,12 +544,12 @@ def reformat_and_save(args):
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily')
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
     os.chdir(main_dir)
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'txt__raw_dwd_data/pres_daily_met')
+    in_dir = Path(r'extracted/pcp.obs.h')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -557,8 +557,8 @@ def main():
     # One of these should be in the file.
 
     # Precip
-#     data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS', 'RSK']
-#     out_data_col_pref = 'P'
+    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS', 'RSK']
+    out_data_col_pref = 'P'
 
     # Temp mean or hourly.
 #     data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
@@ -569,15 +569,16 @@ def main():
 #     out_data_col_pref = 'TN'
 
     # Temp maximum.
-    data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
-    out_data_col_pref = 'TX'
+    # data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
+    # out_data_col_pref = 'TX'
 
     # Directory names. These have files for each station.
 #     match_patt = '1minutenwerte_nieder_*'  # minute
-#     match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+    # match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+    match_patt = '*stundenwerte_RR_*'  # hourly
 #     match_patt = 'tageswerte_[0-9]*'  # daily
 #     match_patt = 'tageswerte_RR_[0-9]*'  # daily
-    match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
+    # match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -596,22 +597,22 @@ def main():
     seps = [';']
 
 #     time_fmts = ['%Y%m%d%H%M']  # minute
-#     time_fmts = ['%Y%m%d%H']  # hourly
-    time_fmts = ['%Y%m%d']  # daily
+    time_fmts = ['%Y%m%d%H']  # hourly
+    # time_fmts = ['%Y%m%d']  # daily
 
     nan_vals = [-999]
 
     nc_calendar = 'gregorian'
 
     # Can be D, H, min, or T only.
-    out_freq = 'D'
+    out_freq = 'H'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'years'
 
-    out_dir = Path(f'hdf5__all_dss/daily_tx_annual')
+    out_dir = Path(f'hdf5__all_dss/hourly_rr_annual')
 
-    n_cpus = 8
+    n_cpus = 4
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

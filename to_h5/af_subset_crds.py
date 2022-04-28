@@ -17,6 +17,61 @@ from osgeo import ogr
 DEBUG_FLAG = False
 
 
+def main():
+
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7\crds')
+    os.chdir(main_dir)
+
+    # NOTE: in_crds_file and subset_shp_file should have the same CRS.
+    in_crds_file = Path(r'gkz3/hourly_rr_epsg31467.csv')
+
+    sep = ';'
+
+    subset_shp_file = Path(
+        r'P:\Downloads\pcp.obs.SP7\shapefiles\cats_epsg31467_gkz3.shp')
+
+    subset_shp_fld = 'GaugeID'
+    shp_buff_dist = 20e6
+
+    # If zero than no simplification is calculated.
+    simplyify_tol = 90
+
+    out_dir = Path(r'hourly_sp7_rr_stns')
+    #==========================================================================
+
+    print('Reading inputs...')
+
+    cat_poly = get_merged_poly(subset_shp_file, subset_shp_fld, simplyify_tol)
+    cat_buff = cat_poly.Buffer(shp_buff_dist)
+    assert cat_buff
+
+    in_crds_df = pd.read_csv(
+        in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y', 'Z']]
+
+    # Remove duplicate, the user can also implement proper selection
+    # because a change station location means a new time series normally.
+    keep_crds_stns_steps = ~in_crds_df.index.duplicated(keep='last')
+    in_crds_df = in_crds_df.loc[keep_crds_stns_steps]
+
+    in_crds_df.sort_index(inplace=True)
+
+    print('Testing containment...')
+    contain_crds = get_stns_in_poly(in_crds_df, cat_buff)
+
+    subset_crds_stns = in_crds_df.index.intersection(contain_crds)
+
+    print(subset_crds_stns.size, 'stations selected in crds_df!')
+
+    print('Writing output...')
+
+    out_dir.mkdir(exist_ok=True)
+
+    in_crds_df.loc[subset_crds_stns].to_csv(
+        out_dir / f'{in_crds_file.name}', sep=sep)
+
+    return
+
+
 def get_stns_in_poly(crds_df, poly):
 
     contain_stns = []
@@ -82,61 +137,6 @@ def get_merged_poly(in_shp, field='DN', simplify_tol=0):
 
     cat_ds.Destroy()
     return merged_cat
-
-
-def main():
-
-    main_dir = Path(r'P:\dwd_meteo\daily\crds')
-    os.chdir(main_dir)
-
-    # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3/daily_ppt_epsg31467.csv')
-
-    sep = ';'
-
-    subset_shp_file = Path(
-        r'P:\Synchronize\IWS\QGIS_Neckar\raster\taudem_out_spate_rockenau\watersheds.shp')
-
-    subset_shp_fld = 'DN'
-    shp_buff_dist = 0
-
-    # If zero than no simplification is calculated.
-    simplyify_tol = 90
-
-    out_dir = Path(r'daily_neckar_no_buff')
-    #==========================================================================
-
-    print('Reading inputs...')
-
-    cat_poly = get_merged_poly(subset_shp_file, subset_shp_fld, simplyify_tol)
-    cat_buff = cat_poly.Buffer(shp_buff_dist)
-    assert cat_buff
-
-    in_crds_df = pd.read_csv(
-        in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y', 'Z']]
-
-    # Remove duplicate, the user can also implement proper selection
-    # because a change station location means a new time series normally.
-    keep_crds_stns_steps = ~in_crds_df.index.duplicated(keep='last')
-    in_crds_df = in_crds_df.loc[keep_crds_stns_steps]
-
-    in_crds_df.sort_index(inplace=True)
-
-    print('Testing containment...')
-    contain_crds = get_stns_in_poly(in_crds_df, cat_buff)
-
-    subset_crds_stns = in_crds_df.index.intersection(contain_crds)
-
-    print(subset_crds_stns.size, 'stations selected in crds_df!')
-
-    print('Writing output...')
-
-    out_dir.mkdir(exist_ok=True)
-
-    in_crds_df.loc[subset_crds_stns].to_csv(
-        out_dir / f'{in_crds_file.name}', sep=sep)
-
-    return
 
 
 if __name__ == '__main__':

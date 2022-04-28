@@ -19,11 +19,11 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily')
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
     os.chdir(main_dir)
 
     h5_path = Path(
-        r'hdf5__merged_subset/daily_neckar_tg_Y1971_2010.h5')
+        r'hdf5__merged_subset/hourly_sp7_rr_stns.h5')
 
     # Two extensions allowed: .csv and .pkl.
     # csv: text dump, pkl: dataframe as pickle dump.
@@ -32,9 +32,9 @@ def main():
         r'dfs__merged_subset') / f'{h5_path.stem}.pkl'
 
     # In case of .csv format.
-    float_fmt = '%0.3f'
-
+    float_fmt = '%0.2f'
     #==========================================================================
+
     out_df_path.parents[0].mkdir(exist_ok=True, parents=True)
 
     assert h5_path.exists()

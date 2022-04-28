@@ -18,6 +18,99 @@ import pandas as pd
 DEBUG_FLAG = False
 
 
+def main():
+
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    os.chdir(main_dir)
+
+    in_dir = Path(r'extracted\pcp.obs.h')
+
+    out_data_col_pref = 'P'
+
+    # all columns are stripped of white spaces, and are capitalized
+
+    # one of these should be in the file
+    x_data_cols = ['GEOGR.LAENGE']
+    y_data_cols = ['GEOGR.BREITE']
+    z_data_cols = ['STATIONSHOEHE']
+
+    beg_time_cols = ['VON_DATUM']
+    end_time_cols = ['BIS_DATUM']
+
+    stn_id_cols = ['STATIONS_ID']
+    stn_name_cols = ['STATIONSNAME']
+
+    file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
+
+    # Can go in to dirs by having a slash.
+
+    # Precipitation.
+    dir_name_patts = [
+        # '*_met/tageswerte_[0-9]*',
+        # '*_met/tageswerte_KL_[0-9]*',
+        # '*precip/tageswerte_RR_[0-9]*',
+        '*stundenwerte_RR_[0-9]*'
+        ]
+
+    # Temperature.
+    # dir_name_patts = [
+    #     '*_met/tageswerte_[0-9]*',
+    #     '*_met/tageswerte_KL_[0-9]*']
+
+    seps = [';']
+
+    time_fmts = ['%Y%m%d']
+
+    nan_vals = [-999]
+
+    out_ext = 'csv'
+
+    out_time_fmt = '%Y-%m-%d'
+
+    out_sep = ';'
+
+    out_dir = Path(f'crds/geo_crds_rr')
+    out_name = f'hourly_rr_geo_crds.{out_ext}'
+
+    out_dir.mkdir(exist_ok=True, parents=True)
+
+    all_stn_dirs = []
+    for dir_name_patt in dir_name_patts:
+        all_stn_dirs.extend(list(in_dir.glob(f'./{dir_name_patt}')))
+
+    assert all_stn_dirs, 'No directories selected!'
+
+    file_ctr, dir_ctr, csv_stream = reformat_and_save(
+            (all_stn_dirs,
+             seps,
+             x_data_cols,
+             y_data_cols,
+             z_data_cols,
+             beg_time_cols,
+             end_time_cols,
+             stn_id_cols,
+             stn_name_cols,
+             out_data_col_pref,
+             file_pref_patts,
+             time_fmts,
+             out_sep,
+             nan_vals,
+             out_time_fmt,
+             ))
+
+    csv_stream.seek(0)
+    with open(out_dir / out_name, 'w') as hdl:
+        hdl.write(csv_stream.getvalue())
+
+#     pd.read_csv(csv_stream, sep=out_sep, index_col=0, skipinitialspace=True).to_csv(
+#         out_dir / f'{in_dir.name}_geo_crds_test.{out_ext}',
+#         sep=out_sep,
+#         date_format=out_time_fmt)
+
+    print('file_ctr, dir_ctr:', file_ctr, dir_ctr)
+    return
+
+
 def ret_mp_idxs(n_vals, n_cpus):
 
     assert n_vals > 0
@@ -200,97 +293,6 @@ def check_and_get_valid_column(raw_df_cols, chk_cols, label):
     ret_col = chk_cols[chk_col_flags.index(True)]
 
     return ret_col
-
-
-def main():
-
-    main_dir = Path(r'P:\dwd_meteo\daily')
-    os.chdir(main_dir)
-
-    in_dir = Path(r'txt__raw_dwd_data')
-
-    out_data_col_pref = 'TN'
-
-    # all columns are stripped of white spaces, and are capitalized
-
-    # one of these should be in the file
-    x_data_cols = ['GEOGR.LAENGE']
-    y_data_cols = ['GEOGR.BREITE']
-    z_data_cols = ['STATIONSHOEHE']
-
-    beg_time_cols = ['VON_DATUM']
-    end_time_cols = ['BIS_DATUM']
-
-    stn_id_cols = ['STATIONS_ID']
-    stn_name_cols = ['STATIONSNAME']
-
-    file_pref_patts = ['Metadaten_Geographie*.txt', 'Stationsmetadaten_*.txt']
-
-    # Can go in to dirs by having a slash.
-
-    # Precipitation.
-#     dir_name_patts = [
-#         '*_met/tageswerte_[0-9]*',
-#         '*_met/tageswerte_KL_[0-9]*',
-#         '*precip/tageswerte_RR_[0-9]*']
-
-    # Temperature.
-    dir_name_patts = [
-        '*_met/tageswerte_[0-9]*',
-        '*_met/tageswerte_KL_[0-9]*']
-
-    seps = [';']
-
-    time_fmts = ['%Y%m%d']
-
-    nan_vals = [-999]
-
-    out_ext = 'csv'
-
-    out_time_fmt = '%Y-%m-%d'
-
-    out_sep = ';'
-
-    out_dir = Path(f'crds/geo_crds_tem')
-    out_name = f'daily_tn_geo_crds.{out_ext}'
-
-    out_dir.mkdir(exist_ok=True, parents=True)
-
-    all_stn_dirs = []
-    for dir_name_patt in dir_name_patts:
-        all_stn_dirs.extend(list(in_dir.glob(f'./{dir_name_patt}')))
-
-    assert all_stn_dirs, 'No directories selected!'
-
-    file_ctr, dir_ctr, csv_stream = reformat_and_save(
-            (all_stn_dirs,
-             seps,
-             x_data_cols,
-             y_data_cols,
-             z_data_cols,
-             beg_time_cols,
-             end_time_cols,
-             stn_id_cols,
-             stn_name_cols,
-             out_data_col_pref,
-             file_pref_patts,
-             time_fmts,
-             out_sep,
-             nan_vals,
-             out_time_fmt,
-             ))
-
-    csv_stream.seek(0)
-    with open(out_dir / out_name, 'w') as hdl:
-        hdl.write(csv_stream.getvalue())
-
-#     pd.read_csv(csv_stream, sep=out_sep, index_col=0, skipinitialspace=True).to_csv(
-#         out_dir / f'{in_dir.name}_geo_crds_test.{out_ext}',
-#         sep=out_sep,
-#         date_format=out_time_fmt)
-
-    print('file_ctr, dir_ctr:', file_ctr, dir_ctr)
-    return
 
 
 if __name__ == '__main__':

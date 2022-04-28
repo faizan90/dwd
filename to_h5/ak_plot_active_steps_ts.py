@@ -27,7 +27,7 @@ def main():
 
     # .csv and .pkl allowed only.
     in_df_path = Path(
-        r'P:\dwd_meteo\daily\dfs__merged_subset\daily_neckar_tg_Y1971_2010.pkl')
+        r'P:\dwd_meteo\daily\dfs__merged_subset\daily_neckar_tn_Y1961_2015.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'

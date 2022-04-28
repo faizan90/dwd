@@ -18,32 +18,37 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily_de_buff_100km_ppt___merged__daily_hourly_dwd_neg7h__daily_ecad')
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'daily_de_ppt_Y1961_2020__merged_data.pkl')
+    in_df_path = Path(r'dfs__merged_subset\hourly_sp7_rr_stns.pkl')
 
+    # In case of .csv
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
     float_fmt = '%0.3f'
 
+    # In case of .h5.
+    hdf_key = 'hourly_resmapled_rr'
+
     # Can be .pkl or .csv.
     out_fmt = '.pkl'
 #     out_fmt = '.csv'
+    # out_fmt = '.h5'
 
     out_dir = Path(r'dfs__resampled')
 
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled should have a min-count to get a non Na value.
     # This is because resample sum does not have a skipna flag.
-#     resample_ress = ['D']
-#     min_counts = [24]
+    resample_ress = ['D']
+    min_counts = [24]
 
     # In case of months, the resampling is slightly different than hours etc.
-    resample_ress = ['m']
-    min_counts = [None]
+    # resample_ress = ['m']
+    # min_counts = [None]
 
 #     resample_types = ['mean']  # , 'min', 'max']
     resample_types = ['sum']
@@ -51,7 +56,7 @@ def main():
     # Applied to shift the entire time series by this offset.
     tdelta = pd.Timedelta(0, unit='h')
 
-    assert out_fmt in ('.csv', '.pkl')
+    assert out_fmt in ('.csv', '.pkl', '.h5')
 
     assert len(resample_ress) == len(min_counts)
 
@@ -91,7 +96,8 @@ def main():
 
         for resample_type in resample_types:
 
-            resample_df = getattr(in_df.resample(resample_res), resample_type)()
+            resample_df = getattr(
+                in_df.resample(resample_res), resample_type)()
 
             resample_df *= counts_df
 
@@ -114,6 +120,9 @@ def main():
 
             elif out_fmt == '.pkl':
                 resample_df.to_pickle(out_path)
+
+            elif out_fmt == '.h5':
+                resample_df.to_hdf(out_path, key=hdf_key)
 
             else:
                 raise NotImplementedError(

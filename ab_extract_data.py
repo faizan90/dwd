@@ -18,10 +18,10 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\minute\precipitation')
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
     os.chdir(main_dir)
 
-    in_dir = Path(r'recent')
+    in_dir = Path(r'pcp.obs.h')
     out_dir = Path(r'extracted')
 
     zip_exe = Path(r'C:\Program Files\7-Zip\7z.exe')

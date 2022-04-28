@@ -14,22 +14,36 @@ from pathlib import Path
 import pyproj
 import pandas as pd
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily\crds')
+    main_dir = Path(r'P:\Downloads\pcp.obs.SP7\crds')
     os.chdir(main_dir)
 
-    in_file = Path(r'geo_crds_tem/daily_tg_geo_crds.csv')
+    # Original
+    if True:
+        in_file = Path(r'geo_crds_rr/hourly_rr_geo_crds.csv')
+
+        in_epsg = 4326
+        out_epsg = 31467
+
+        out_file = Path(f'gkz3/hourly_rr_epsg{out_epsg}.csv')
+
+    # Neckar gkz3 to utm32n. Change conditional below as well.
+    elif False:
+        in_file = Path(r'daily_neckar_20km_buff/daily_tx_epsg31467.csv')
+
+        in_epsg = 31467
+        out_epsg = 32632
+
+        out_file = Path(f'daily_neckar_20km_buff/daily_tx_epsg{out_epsg}.csv')
+
+    else:
+        raise NotImplementedError
 
     sep = ';'
-
-    in_epsg = 4326
-    out_epsg = 31467
-
-    out_file = Path(f'gkz3/daily_tg_epsg{out_epsg}.csv')
 
     out_float_fmt = '%0.0f'
 
@@ -38,11 +52,22 @@ def main():
     #
     # The order of the first three columns should be longitude, latitude
     # and altitude.
-    in_cols = (
-        'GEOGR.LAENGE;GEOGR.BREITE;'
-        'STATIONSHOEHE;VON_DATUM;BIS_DATUM').split(';')
 
-    out_cols = ['X', 'Y', 'Z', 'BEG_TIME', 'END_TIME']
+    # Original
+    if True:
+        in_cols = (
+            'GEOGR.LAENGE;GEOGR.BREITE;'
+            'STATIONSHOEHE;VON_DATUM;BIS_DATUM').split(';')
+
+        out_cols = ['X', 'Y', 'Z', 'BEG_TIME', 'END_TIME']
+
+    # Neckar gkz3 to utm32n
+    elif False:
+        in_cols = ['X', 'Y', 'Z']
+        out_cols = ['X', 'Y', 'Z']
+
+    else:
+        raise NotImplementedError
 
     #==========================================================================
     assert len(in_cols) == len(out_cols)
