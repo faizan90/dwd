@@ -19,26 +19,34 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7\crds')
+    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
     os.chdir(main_dir)
 
     # Original
     if True:
-        in_file = Path(r'geo_crds_rr/hourly_rr_geo_crds.csv')
+        in_file = Path(r'geo_crds_ff/hourly_ff_geo_crds.csv')
 
         in_epsg = 4326
         out_epsg = 31467
 
-        out_file = Path(f'gkz3/hourly_rr_epsg{out_epsg}.csv')
+        out_file = Path(f'gkz3_crds_ff/hourly_ff_epsg{out_epsg}.csv')
 
     # Neckar gkz3 to utm32n. Change conditional below as well.
     elif False:
-        in_file = Path(r'daily_neckar_20km_buff/daily_tx_epsg31467.csv')
+        in_file = Path(r'neckar_1hr_tem_data_20km_buff/extracted_gkz3_crds.csv')
 
         in_epsg = 31467
         out_epsg = 32632
 
-        out_file = Path(f'daily_neckar_20km_buff/daily_tx_epsg{out_epsg}.csv')
+        out_file = Path(f'neckar_1hr_tem_data_20km_buff/hourly_tn_epsg{out_epsg}.csv')
+
+    elif False:
+        in_file = Path(r'geo_crds_ff\hourly_ff_geo_crds.csv')
+
+        in_epsg = 4326
+        out_epsg = 32632
+
+        out_file = Path(f'utm32n/hourly_ff_epsg{out_epsg}.csv')
 
     else:
         raise NotImplementedError

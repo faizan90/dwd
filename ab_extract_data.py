@@ -18,11 +18,11 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    main_dir = Path(r'P:\dwd_meteo')
     os.chdir(main_dir)
 
-    in_dir = Path(r'pcp.obs.h')
-    out_dir = Path(r'extracted')
+    in_dir = Path(r'zipped_DWD_data')
+    out_dir = Path(r'hourly/txt__raw_dwd_data')
 
     zip_exe = Path(r'C:\Program Files\7-Zip\7z.exe')
 

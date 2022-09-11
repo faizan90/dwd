@@ -19,20 +19,20 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     h5_path = Path(
-        r'hdf5__merged_subset/hourly_sp7_rr_stns.h5')
+        r'hdf5__merged_subset/neckar_1hr_wind_data_20km_buff_Y2004_2020.h5')
 
     # Two extensions allowed: .csv and .pkl.
     # csv: text dump, pkl: dataframe as pickle dump.
     # An error otherwise.
     out_df_path = Path(
-        r'dfs__merged_subset') / f'{h5_path.stem}.pkl'
+        r'dfs__merged_subset') / f'{h5_path.stem}.csv'
 
     # In case of .csv format.
-    float_fmt = '%0.2f'
+    float_fmt = '%0.3f'
     #==========================================================================
 
     out_df_path.parents[0].mkdir(exist_ok=True, parents=True)

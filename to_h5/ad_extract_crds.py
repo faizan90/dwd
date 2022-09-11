@@ -20,12 +20,12 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
-    in_dir = Path(r'extracted\pcp.obs.h')
+    in_dir = Path(r'P:\dwd_meteo\hourly\txt__raw_dwd_data')
 
-    out_data_col_pref = 'P'
+    out_data_col_pref = 'F'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -45,17 +45,22 @@ def main():
     # Can go in to dirs by having a slash.
 
     # Precipitation.
-    dir_name_patts = [
-        # '*_met/tageswerte_[0-9]*',
-        # '*_met/tageswerte_KL_[0-9]*',
-        # '*precip/tageswerte_RR_[0-9]*',
-        '*stundenwerte_RR_[0-9]*'
-        ]
+    # dir_name_patts = [
+    #     '*_met/tageswerte_[0-9]*',
+    #     '*_met/tageswerte_KL_[0-9]*',
+    #     '*precip/tageswerte_RR_[0-9]*',
+    #     '*stundenwerte_RR_[0-9]*'
+    #     ]
 
     # Temperature.
     # dir_name_patts = [
     #     '*_met/tageswerte_[0-9]*',
     #     '*_met/tageswerte_KL_[0-9]*']
+
+    # Wind.
+    dir_name_patts = [
+        'hist_*/stundenwerte_FF_[0-9]*',
+        'pres_*/stundenwerte_FF_[0-9]*', ]
 
     seps = [';']
 
@@ -69,8 +74,8 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds_rr')
-    out_name = f'hourly_rr_geo_crds.{out_ext}'
+    out_dir = Path(f'crds/geo_crds_ff')
+    out_name = f'hourly_ff_geo_crds.{out_ext}'
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

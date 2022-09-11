@@ -19,24 +19,24 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7\crds')
+    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'gkz3/hourly_rr_epsg31467.csv')
+    in_crds_file = Path(r'neckar_1hr_wind_data_20km_buff/hourly_ff_epsg32632.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Downloads\pcp.obs.SP7\shapefiles\cats_epsg31467_gkz3.shp')
+        r'P:\Synchronize\IWS\Colleagues_Students\Vazkan\wind_data\neckar_catchments.shp')
 
-    subset_shp_fld = 'GaugeID'
-    shp_buff_dist = 20e6
+    subset_shp_fld = 'DN'
+    shp_buff_dist = 20e3
 
     # If zero than no simplification is calculated.
     simplyify_tol = 90
 
-    out_dir = Path(r'hourly_sp7_rr_stns')
+    out_dir = Path(r'neckar_1hr_wind_data_20km_buff')
     #==========================================================================
 
     print('Reading inputs...')

@@ -26,6 +26,153 @@ MSGS_FLAG = True
 DATA_TXT_PREF = 'produkt*'
 
 
+def main():
+
+    main_dir = Path(r'P:\dwd_meteo\hourly')
+    os.chdir(main_dir)
+
+    # DATA_TXT_PREF might need changing based on dataset.
+
+    in_dir = Path(r'txt__raw_dwd_data/pres_hourly_wind')
+
+    # NOTE: all columns are stripped of white spaces around them, and are
+    # capitalized before search in the input files.
+
+    # One of these should be in the file.
+
+    # Precip
+    # data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS', 'RSK']
+    # out_data_col_pref = 'P'
+
+    # Temp mean or hourly.
+    # data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
+    # out_data_col_pref = 'TG'
+
+    # Temp minimum.
+    # data_cols = ['TNK', 'LUFTTEMPERATUR_MINIMUM']
+    # out_data_col_pref = 'TN'
+
+    # Temp maximum.
+    # data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
+    # out_data_col_pref = 'TX'
+
+    # Wind
+    data_cols = ['F', ]
+    out_data_col_pref = 'F'
+
+    # Directory names. These have files for each station.
+    # match_patt = '1minutenwerte_nieder_*'  # minute
+    # match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+    # match_patt = '*stundenwerte_RR_*'  # hourly
+    # match_patt = 'tageswerte_[0-9]*'  # daily
+    # match_patt = 'tageswerte_RR_[0-9]*'  # daily
+    # match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
+    match_patt = 'stundenwerte_FF_*'  # hourly wind
+
+    # If interval_flag then, len(time_cols) == 2.
+    # First label in time_cols is for the time at which the reading began.
+    # Second label in time_cols is for the time at which the reading ended.
+    # Check the files, if they have the begin and end columns.
+    # Values within a given interval, get the same value as the interval
+    # end time. Please check if this should be the case. Otherwise, change code
+    # accordingly.
+    interval_vals_flag = False
+
+    # time_cols = ['MESS_DATUM_BEGINN', 'MESS_DATUM_ENDE']  # minute
+    time_cols = ['MESS_DATUM']  # hourly, minute
+
+    stn_cols = ['STATIONS_ID']
+
+    seps = [';']
+
+    # time_fmts = ['%Y%m%d%H%M']  # minute
+    time_fmts = ['%Y%m%d%H']  # hourly
+    # time_fmts = ['%Y%m%d']  # daily
+
+    nan_vals = [-999]
+
+    nc_calendar = 'gregorian'
+
+    # Can be D, H, min, or T only.
+    out_freq = 'H'
+
+    # Can be months or years. Both are used in search in ag_subset_h5_data
+    sep_basis = 'years'
+
+    out_dir = Path(f'hdf5__all_dss/annual_ff')
+
+    n_cpus = 4
+
+    out_dir.mkdir(exist_ok=True, parents=True)
+
+    all_stn_dirs = list(in_dir.glob(f'./{match_patt}'))
+
+    assert all_stn_dirs, 'No directories selected!'
+
+    random.shuffle(all_stn_dirs)
+
+    if n_cpus == 1:
+        lock = Lock()
+
+        ctrs = reformat_and_save(
+            (all_stn_dirs,
+             seps,
+             data_cols,
+             time_cols,
+             stn_cols,
+             out_data_col_pref,
+             time_fmts,
+             out_dir,
+             nan_vals,
+             nc_calendar,
+             out_freq,
+             lock,
+             interval_vals_flag,
+             sep_basis,
+             ))
+
+    else:
+        mp_idxs = ret_mp_idxs(len(all_stn_dirs), n_cpus)
+
+        lock = Manager().Lock()
+
+        args_gen = ((
+         all_stn_dirs[mp_idxs[thrd_idx]:mp_idxs[thrd_idx + 1]],
+         seps,
+         data_cols,
+         time_cols,
+         stn_cols,
+         out_data_col_pref,
+         time_fmts,
+         out_dir,
+         nan_vals,
+         nc_calendar,
+         out_freq,
+         lock,
+         interval_vals_flag,
+         sep_basis,
+         )
+        for thrd_idx in range(n_cpus))
+
+        mp_pool = Pool(n_cpus)
+
+        ctrs = mp_pool.map(reformat_and_save, args_gen)
+
+        mp_pool.close()
+
+        mp_pool.join()
+
+    ctrs = np.atleast_2d(ctrs)
+
+    ctrs_sum = ctrs.sum(axis=0)
+
+    print('files, dirs:', ctrs_sum)
+
+    assert ctrs_sum[0] >= ctrs_sum[1]
+
+    return
+
+
 def ret_mp_idxs(n_vals, n_cpus):
 
     assert n_vals > 0
@@ -540,148 +687,6 @@ def reformat_and_save(args):
         assert stn_file_ctr > 0, 'No file present in this directory!'
 
     return file_ctr, dir_ctr
-
-
-def main():
-
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
-    os.chdir(main_dir)
-
-    # DATA_TXT_PREF might need changing based on dataset.
-
-    in_dir = Path(r'extracted/pcp.obs.h')
-
-    # NOTE: all columns are stripped of white spaces around them, and are
-    # capitalized before search in the input files.
-
-    # One of these should be in the file.
-
-    # Precip
-    data_cols = ['RS_01', 'R1', 'NIEDERSCHLAGSHOEHE', 'RS', 'RSK']
-    out_data_col_pref = 'P'
-
-    # Temp mean or hourly.
-#     data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
-#     out_data_col_pref = 'TG'
-
-    # Temp minimum.
-#     data_cols = ['TNK', 'LUFTTEMPERATUR_MINIMUM']
-#     out_data_col_pref = 'TN'
-
-    # Temp maximum.
-    # data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
-    # out_data_col_pref = 'TX'
-
-    # Directory names. These have files for each station.
-#     match_patt = '1minutenwerte_nieder_*'  # minute
-    # match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
-    match_patt = '*stundenwerte_RR_*'  # hourly
-#     match_patt = 'tageswerte_[0-9]*'  # daily
-#     match_patt = 'tageswerte_RR_[0-9]*'  # daily
-    # match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
-
-    # If interval_flag then, len(time_cols) == 2.
-    # First label in time_cols is for the time at which the reading began.
-    # Second label in time_cols is for the time at which the reading ended.
-    # Check the files, if they have the begin and end columns.
-    # Values within a given interval, get the same value as the interval
-    # end time. Please check if this should be the case. Otherwise, change code
-    # accordingly.
-    interval_vals_flag = False
-
-#     time_cols = ['MESS_DATUM_BEGINN', 'MESS_DATUM_ENDE']  # minute
-    time_cols = ['MESS_DATUM']  # hourly, minute
-
-    stn_cols = ['STATIONS_ID']
-
-    seps = [';']
-
-#     time_fmts = ['%Y%m%d%H%M']  # minute
-    time_fmts = ['%Y%m%d%H']  # hourly
-    # time_fmts = ['%Y%m%d']  # daily
-
-    nan_vals = [-999]
-
-    nc_calendar = 'gregorian'
-
-    # Can be D, H, min, or T only.
-    out_freq = 'H'
-
-    # Can be months or years. Both are used in search in ag_subset_h5_data
-    sep_basis = 'years'
-
-    out_dir = Path(f'hdf5__all_dss/hourly_rr_annual')
-
-    n_cpus = 4
-
-    out_dir.mkdir(exist_ok=True, parents=True)
-
-    all_stn_dirs = list(in_dir.glob(f'./{match_patt}'))
-
-    assert all_stn_dirs, 'No directories selected!'
-
-    random.shuffle(all_stn_dirs)
-
-    if n_cpus == 1:
-        lock = Lock()
-
-        ctrs = reformat_and_save(
-            (all_stn_dirs,
-             seps,
-             data_cols,
-             time_cols,
-             stn_cols,
-             out_data_col_pref,
-             time_fmts,
-             out_dir,
-             nan_vals,
-             nc_calendar,
-             out_freq,
-             lock,
-             interval_vals_flag,
-             sep_basis,
-             ))
-
-    else:
-        mp_idxs = ret_mp_idxs(len(all_stn_dirs), n_cpus)
-
-        lock = Manager().Lock()
-
-        args_gen = ((
-         all_stn_dirs[mp_idxs[thrd_idx]:mp_idxs[thrd_idx + 1]],
-         seps,
-         data_cols,
-         time_cols,
-         stn_cols,
-         out_data_col_pref,
-         time_fmts,
-         out_dir,
-         nan_vals,
-         nc_calendar,
-         out_freq,
-         lock,
-         interval_vals_flag,
-         sep_basis,
-         )
-        for thrd_idx in range(n_cpus))
-
-        mp_pool = Pool(n_cpus)
-
-        ctrs = mp_pool.map(reformat_and_save, args_gen)
-
-        mp_pool.close()
-
-        mp_pool.join()
-
-    ctrs = np.atleast_2d(ctrs)
-
-    ctrs_sum = ctrs.sum(axis=0)
-
-    print('files, dirs:', ctrs_sum)
-
-    assert ctrs_sum[0] >= ctrs_sum[1]
-
-    return
 
 
 if __name__ == '__main__':

@@ -21,13 +21,13 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed only.
     in_df_path = Path(
-        r'P:\dwd_meteo\daily\dfs__merged_subset\daily_neckar_tn_Y1961_2015.pkl')
+        r'dfs__merged_subset\neckar_1hr_wind_data_20km_buff_Y2004_2020.pkl')
 
     sep = ';'
     time_fmt = '%Y-%m-%d %H:%M:%S'
@@ -36,7 +36,7 @@ def main():
 
     fig_size_long = (18, 8)
     dpi = 200
-    xlabel = 'Time (day)'
+    xlabel = 'Time (hour)'
     ylabel = 'Number of active stations (-)'
 
     out_dir.mkdir(exist_ok=True, parents=True)

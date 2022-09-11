@@ -24,20 +24,21 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5__all_dss\hourly_rr_annual')]
+        Path(r'hdf5__all_dss\annual_ff')]
 
     data_name_patts = [
         # 'TX_Y{year:4d}.h5'
-        'P_Y{year:4d}.h5'
+        # 'P_Y{year:4d}.h5'
+        'F_Y{year:4d}.h5'
         ]
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\hourly_sp7_rr_stns\hourly_rr_epsg31467.csv')
+        r'crds\neckar_1hr_wind_data_20km_buff\hourly_ff_epsg32632.csv')
 
     sep = ';'
 
@@ -45,13 +46,13 @@ def main():
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '1995-01-01 00:00:00'
-    end_time = '2021-12-31 23:59:00'
+    beg_time = '2004-01-01 00:00:00'
+    end_time = '2020-12-31 23:59:00'
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        f'hdf5__merged_subset/hourly_sp7_rr_stns.h5')
+        f'hdf5__merged_subset/neckar_1hr_wind_data_20km_buff_Y2004_2020.h5')
 
     overwrite_output_flag = True
     #==========================================================================
