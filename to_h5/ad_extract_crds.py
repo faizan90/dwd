@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 @author: Faizan-Uni-Stuttgart
 
@@ -25,7 +27,7 @@ def main():
 
     in_dir = Path(r'P:\dwd_meteo\hourly\txt__raw_dwd_data')
 
-    out_data_col_pref = 'F'
+    out_data_col_pref = 'T'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -45,22 +47,24 @@ def main():
     # Can go in to dirs by having a slash.
 
     # Precipitation.
-    # dir_name_patts = [
-    #     '*_met/tageswerte_[0-9]*',
-    #     '*_met/tageswerte_KL_[0-9]*',
-    #     '*precip/tageswerte_RR_[0-9]*',
-    #     '*stundenwerte_RR_[0-9]*'
-    #     ]
+    dir_name_patts = [
+        # '*_met/tageswerte_[0-9]*',
+        # '*_met/tageswerte_KL_[0-9]*',
+        # '*precip/tageswerte_RR_[0-9]*',
+        '*precip/stundenwerte_RR_[0-9]*'
+        ]
 
     # Temperature.
     # dir_name_patts = [
-    #     '*_met/tageswerte_[0-9]*',
-    #     '*_met/tageswerte_KL_[0-9]*']
+    #     # '*_met/tageswerte_[0-9]*',
+    #     # '*_met/tageswerte_KL_[0-9]*',
+    #     '*_temp/stundenwerte_TU_[0-9]*'
+    #     ]
 
     # Wind.
-    dir_name_patts = [
-        'hist_*/stundenwerte_FF_[0-9]*',
-        'pres_*/stundenwerte_FF_[0-9]*', ]
+    # dir_name_patts = [
+    #     'hist_*/stundenwerte_FF_[0-9]*',
+    #     'pres_*/stundenwerte_FF_[0-9]*', ]
 
     seps = [';']
 
@@ -74,10 +78,16 @@ def main():
 
     out_sep = ';'
 
-    out_dir = Path(f'crds/geo_crds_ff')
-    out_name = f'hourly_ff_geo_crds.{out_ext}'
+    out_dir = Path(f'crds/geo_crds')
+    out_name = f'hourly_ppt_geo_crds.{out_ext}'
+
+    # Append to or create a new output file.
+    output_file_mode = 'a'
+    #==========================================================================
 
     out_dir.mkdir(exist_ok=True, parents=True)
+
+    assert output_file_mode in ('a', 'w'), output_file_mode
 
     all_stn_dirs = []
     for dir_name_patt in dir_name_patts:
@@ -86,26 +96,70 @@ def main():
     assert all_stn_dirs, 'No directories selected!'
 
     file_ctr, dir_ctr, csv_stream = reformat_and_save(
-            (all_stn_dirs,
-             seps,
-             x_data_cols,
-             y_data_cols,
-             z_data_cols,
-             beg_time_cols,
-             end_time_cols,
-             stn_id_cols,
-             stn_name_cols,
-             out_data_col_pref,
-             file_pref_patts,
-             time_fmts,
-             out_sep,
-             nan_vals,
-             out_time_fmt,
-             ))
+        (all_stn_dirs,
+         seps,
+         x_data_cols,
+         y_data_cols,
+         z_data_cols,
+         beg_time_cols,
+         end_time_cols,
+         stn_id_cols,
+         stn_name_cols,
+         out_data_col_pref,
+         file_pref_patts,
+         time_fmts,
+         out_sep,
+         nan_vals,
+         out_time_fmt,
+         ))
 
     csv_stream.seek(0)
-    with open(out_dir / out_name, 'w') as hdl:
-        hdl.write(csv_stream.getvalue())
+
+    if (out_dir / out_name).exists() and (output_file_mode == 'a'):
+
+        tmp_out_name = out_name + '.tmp'
+        with open(out_dir / tmp_out_name, 'w') as hdl:
+            hdl.write(csv_stream.getvalue())
+
+        pre_df = pd.read_csv(
+            out_dir / out_name,
+            sep=out_sep,
+            index_col=0,
+            engine='python',
+            encoding='latin1')
+
+        # For older dataframes.
+        for col in pre_df:
+
+            try:
+                pre_df[col] = pre_df[col].str.strip()
+
+            except AttributeError:
+                pass
+
+        tmp_df = pd.read_csv(
+            out_dir / tmp_out_name,
+            sep=out_sep,
+            index_col=0,
+            engine='python',
+            encoding='latin1')
+
+        print('pre_df shape:', pre_df.shape)
+        print('tmp_df shape:', tmp_df.shape)
+
+        out_df = pd.concat((pre_df, tmp_df))
+
+        print('out_df shape:', out_df.shape)
+
+        out_df.sort_index(inplace=True)
+
+        out_df.to_csv(out_dir / out_name, sep=out_sep)
+
+        os.remove(out_dir / tmp_out_name)
+
+    else:
+        with open(out_dir / out_name, 'w') as hdl:
+            hdl.write(csv_stream.getvalue())
 
 #     pd.read_csv(csv_stream, sep=out_sep, index_col=0, skipinitialspace=True).to_csv(
 #         out_dir / f'{in_dir.name}_geo_crds_test.{out_ext}',
@@ -271,12 +325,19 @@ def reformat_and_save(args):
 
             out_df.replace(nan_vals, float('nan'), inplace=True)
 
+            for col in out_df:
+                try:
+                    out_df[col] = out_df[col].str.strip()
+
+                except AttributeError:
+                    pass
+
             out_df.to_csv(
                 csv_stream,
                 sep=out_sep,
                 date_format=out_time_fmt,
                 header=None,
-                line_terminator='\n',
+                lineterminator='\n',
                 encoding='utf-8')
 
             print('Saved:', stn_id)

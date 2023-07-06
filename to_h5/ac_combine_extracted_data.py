@@ -33,7 +33,7 @@ def main():
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'txt__raw_dwd_data/pres_hourly_wind')
+    in_dir = Path(r'txt__raw_dwd_data/pres_hourly_temp')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -45,29 +45,30 @@ def main():
     # out_data_col_pref = 'P'
 
     # Temp mean or hourly.
-    # data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
-    # out_data_col_pref = 'TG'
+    data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
+    # out_data_col_pref = 'TG'  # For Daily.
+    out_data_col_pref = 'T'  # For hourly.
 
     # Temp minimum.
     # data_cols = ['TNK', 'LUFTTEMPERATUR_MINIMUM']
-    # out_data_col_pref = 'TN'
+    # out_data_col_pref = 'TN'  # Only for daily.
 
     # Temp maximum.
     # data_cols = ['TXK', 'LUFTTEMPERATUR_MAXIMUM']
-    # out_data_col_pref = 'TX'
+    # out_data_col_pref = 'TX'  # Only for daily.
 
     # Wind
-    data_cols = ['F', ]
-    out_data_col_pref = 'F'
+    # data_cols = ['F', ]
+    # out_data_col_pref = 'F'
 
     # Directory names. These have files for each station.
     # match_patt = '1minutenwerte_nieder_*'  # minute
-    # match_patt = '*hourly_temp/stundenwerte_TU_*'  # hourly
+    match_patt = 'stundenwerte_TU_*'  # hourly
     # match_patt = '*stundenwerte_RR_*'  # hourly
     # match_patt = 'tageswerte_[0-9]*'  # daily
     # match_patt = 'tageswerte_RR_[0-9]*'  # daily
     # match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
-    match_patt = 'stundenwerte_FF_*'  # hourly wind
+    # match_patt = 'stundenwerte_FF_*'  # hourly wind
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -99,9 +100,10 @@ def main():
     # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'years'
 
-    out_dir = Path(f'hdf5__all_dss/annual_ff')
+    out_dir = Path(f'hdf5__all_dss/annual_tem')
 
     n_cpus = 4
+    #==========================================================================
 
     out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -318,7 +320,9 @@ def validate_h5_file(
             nc_units,
             nc_calendar)
 
-        assert h5_hdl['time/time'][-1] == date2num(pd.to_datetime(end_time, format='%Y-%m-%d %H:%M:%S'), nc_units, nc_calendar)
+        assert h5_hdl['time/time'][-1] == date2num(
+            pd.to_datetime(
+                end_time, format='%Y-%m-%d %H:%M:%S'), nc_units, nc_calendar)
 
         assert 'time/time_strs' in h5_hdl
 
@@ -405,6 +409,11 @@ def write_updt_h5_file(
         stn_ds = data_grp.create_dataset(stn_id_str, (n_steps,), np.float64)
 
         stn_ds[:] = np.nan
+
+    n_exist_vals = np.isfinite(stn_ds[date2nums_idxs][:]).sum()
+    n_updat_vals = np.isfinite(out_df.iloc[sel_idxs, 0].values).sum()
+
+    print('n_exist_vals, n_updat_vals:', n_exist_vals, n_updat_vals)
 
     stn_ds[date2nums_idxs] = out_df.iloc[sel_idxs, 0].values
 

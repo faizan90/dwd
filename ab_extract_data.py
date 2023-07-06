@@ -13,6 +13,8 @@ import subprocess
 from pathlib import Path
 from shutil import copy2
 
+import zipfile
+
 DEBUG_FLAG = True
 
 
@@ -24,19 +26,22 @@ def main():
     in_dir = Path(r'zipped_DWD_data')
     out_dir = Path(r'hourly/txt__raw_dwd_data')
 
-    zip_exe = Path(r'C:\Program Files\7-Zip\7z.exe')
+    # Using zipfile instead.
+    zip_exe = None  # Path(r'C:\Program Files\7-Zip\7z.exe')
 
     in_ext = '.zip'
 
     wild_card = '.txt'
+    #==========================================================================
 
     os.chdir(main_dir)
 
-    assert zip_exe.exists(), '7-Zip executable not found!'
+    if zip_exe is not None:
+        assert zip_exe.exists(), '7-Zip executable not found!'
+
+        zip_exe = str(zip_exe)
 
     out_dir.mkdir(exist_ok=True, parents=True)
-
-    zip_exe = str(zip_exe)
 
     for root, *_, files in os.walk(in_dir):
         if not files:
@@ -56,35 +61,30 @@ def main():
             else:
                 curr_out_path = str(curr_out_dir / (file.split('.')[0]))
 
-                arg = (
-                    zip_exe +
-                    " -y e " +
-                    curr_in_path +
-                    " -o" +
-                    curr_out_path +
-                    " *" +
-                    wild_card +
-                    " -aoa -r -mmem=1000m")
+                if False:
+                    arg = (
+                        zip_exe +
+                        " -y e " +
+                        curr_in_path +
+                        " -o" +
+                        curr_out_path +
+                        " *" +
+                        wild_card +
+                        " -aoa -r -mmem=1000m")
 
-                subprocess.call(arg)
+                    subprocess.call(arg)
+
+                else:
+                    # with py7zr.SevenZipFile(curr_in_path, 'r') as archive:
+                    #     archive.extractall(path=curr_out_path)
+
+                    with zipfile.ZipFile(curr_in_path, 'r') as zip_ref:
+                        zip_ref.extractall(curr_out_path)
 
     return
 
 
 if __name__ == '__main__':
-
-    _save_log_ = False
-    if _save_log_:
-        from datetime import datetime
-        from std_logger import StdFileLoggerCtrl
-
-        # save all console activity to out_log_file
-        out_log_file = os.path.join(
-            r'P:\Synchronize\python_script_logs\\%s_log_%s.log' % (
-            os.path.basename(__file__),
-            datetime.now().strftime('%Y%m%d%H%M%S')))
-
-        log_link = StdFileLoggerCtrl(out_log_file)
 
     print('#### Started on %s ####\n' % time.asctime())
     START = timeit.default_timer()
@@ -111,6 +111,3 @@ if __name__ == '__main__':
     STOP = timeit.default_timer()
     print(('\n#### Done with everything on %s.\nTotal run time was'
            ' about %0.4f seconds ####' % (time.asctime(), STOP - START)))
-
-    if _save_log_:
-        log_link.stop()

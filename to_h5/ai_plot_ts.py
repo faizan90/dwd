@@ -21,11 +21,11 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'D:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     # .csv and .pkl allowed as extensions.
-    in_df_path = Path('dfs__merged_subset/echaz_hourly_tem_50km_buff_Y2016_2020.pkl')
+    in_df_path = Path('dfs__merged_subset/ammer_ppt_30km_buff_Y2005_2020.pkl')
 
     # In case of .csv
     sep = ';'
@@ -35,11 +35,13 @@ def main():
     fig_size = (10, 5)
     dpi = 200
 
-    xlabel = 'Time (hours)'
-    ylabel = 'Temperature (C)'
+    xlabel = 'Time (hour)'
+    # ylabel = 'Temperature (C)'
+    ylabel = 'Precipitation (mm)'
 
     # Outputs' directory
-    out_dir = Path('figs__ts/echaz_hourly_tem')
+    out_dir = Path('figs__ts/ammer_hourly_ppt')
+    #==========================================================================
 
     out_dir.mkdir(exist_ok=True, parents=True)
 

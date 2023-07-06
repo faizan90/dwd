@@ -24,21 +24,21 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'P:\dwd_meteo\daily')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5__all_dss\annual_ff')]
+        Path(r'hdf5__all_dss\daily_tx_annual')]
 
     data_name_patts = [
-        # 'TX_Y{year:4d}.h5'
+        'TX_Y{year:4d}.h5'
         # 'P_Y{year:4d}.h5'
-        'F_Y{year:4d}.h5'
+        # 'F_Y{year:4d}.h5'
         ]
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\neckar_1hr_wind_data_20km_buff\hourly_ff_epsg32632.csv')
+        r'crds\daily_upper_neckar_50km_buff\daily_tx_epsg32632.csv')
 
     sep = ';'
 
@@ -47,12 +47,12 @@ def main():
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
     beg_time = '2004-01-01 00:00:00'
-    end_time = '2020-12-31 23:59:00'
+    end_time = '2023-12-31 23:00:00'  #  For hours, may need to give one more day.
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        f'hdf5__merged_subset/neckar_1hr_wind_data_20km_buff_Y2004_2020.h5')
+        f'hdf5__merged_subset/daily_upper_neckar_50km_buff_tx_Y2005_2022.h5')
 
     overwrite_output_flag = True
     #==========================================================================
@@ -248,7 +248,10 @@ def updt_output(
             nan_idxs = np.isnan(stn_data)
             nnan_idxs = ~nan_idxs
             if np.any(nan_idxs):
+
+                # Add an hour/day to the end_time in case of an error here.
                 in_sel_idxs_stn = np.where(in_sel_idxs)[0][nnan_idxs]
+
                 out_sel_idxs_stn = np.where(out_sel_idxs)[0][nnan_idxs]
 
             else:

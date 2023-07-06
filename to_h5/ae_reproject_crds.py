@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 @author: Faizan-Uni-Stuttgart
 
@@ -23,7 +25,7 @@ def main():
     os.chdir(main_dir)
 
     # Original
-    if True:
+    if False:
         in_file = Path(r'geo_crds_ff/hourly_ff_geo_crds.csv')
 
         in_epsg = 4326
@@ -40,13 +42,13 @@ def main():
 
         out_file = Path(f'neckar_1hr_tem_data_20km_buff/hourly_tn_epsg{out_epsg}.csv')
 
-    elif False:
-        in_file = Path(r'geo_crds_ff\hourly_ff_geo_crds.csv')
+    elif True:
+        in_file = Path(r'geo_crds\hourly_tem_geo_crds.csv')
 
         in_epsg = 4326
         out_epsg = 32632
 
-        out_file = Path(f'utm32n/hourly_ff_epsg{out_epsg}.csv')
+        out_file = Path(f'utm32n/hourly_tem_epsg{out_epsg}.csv')
 
     else:
         raise NotImplementedError
@@ -84,15 +86,23 @@ def main():
 
     print('Going through:', in_file)
 
+    # in_crds_df = pd.read_csv(
+    #     in_file,
+    #     sep=sep,
+    #     engine='python',
+    #     # parse_dates=False,
+    #     index_col=0,
+    #     # dtype=object,
+    #     # skipinitialspace=True,
+    #     encoding='latin1',
+    #     )
+
     in_crds_df = pd.read_csv(
         in_file,
         sep=sep,
-        engine='python',
-        parse_dates=False,
         index_col=0,
-        dtype=object,
-        skipinitialspace=True,
-        encoding='ISO-8859-1')
+        engine='python',
+        encoding='latin1')
 
     print('Input shape:', in_crds_df.shape)
 
@@ -118,24 +128,15 @@ def main():
 
     in_crds_df.columns = out_cols_all
 
-    in_crds_df.to_csv(out_file, sep=sep, float_format=out_float_fmt)
+    in_crds_df.to_csv(
+        out_file,
+        sep=sep,
+        float_format=out_float_fmt,
+        encoding='latin1')
     return
 
 
 if __name__ == '__main__':
-
-    _save_log_ = False
-    if _save_log_:
-        from datetime import datetime
-        from std_logger import StdFileLoggerCtrl
-
-        # save all console activity to out_log_file
-        out_log_file = os.path.join(
-            r'P:\Synchronize\python_script_logs\\%s_log_%s.log' % (
-            os.path.basename(__file__),
-            datetime.now().strftime('%Y%m%d%H%M%S')))
-
-        log_link = StdFileLoggerCtrl(out_log_file)
 
     print('#### Started on %s ####\n' % time.asctime())
     START = timeit.default_timer()
@@ -162,6 +163,3 @@ if __name__ == '__main__':
     STOP = timeit.default_timer()
     print(('\n#### Done with everything on %s.\nTotal run time was'
            ' about %0.4f seconds ####' % (time.asctime(), STOP - START)))
-
-    if _save_log_:
-        log_link.stop()

@@ -18,12 +18,14 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\Downloads\pcp.obs.SP7')
+    # main_dir = Path(r'P:\dwd_meteo\daily\dfs__merged_subset')
+
+    main_dir = Path(r'P:\hydmod\rescaling_upper_neckar\hourly_2005_2022_spinterp_2km_pet\watersheds_lumped_tss')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'dfs__merged_subset\hourly_sp7_rr_stns.pkl')
+    in_df_path = Path(r'pet__EDK.csv')
 
     # In case of .csv
     sep = ';'
@@ -34,11 +36,11 @@ def main():
     hdf_key = 'hourly_resmapled_rr'
 
     # Can be .pkl or .csv.
-    out_fmt = '.pkl'
-#     out_fmt = '.csv'
+    # out_fmt = '.pkl'
+    out_fmt = '.csv'
     # out_fmt = '.h5'
 
-    out_dir = Path(r'dfs__resampled')
+    out_dir = main_dir
 
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled should have a min-count to get a non Na value.
@@ -50,11 +52,11 @@ def main():
     # resample_ress = ['m']
     # min_counts = [None]
 
-#     resample_types = ['mean']  # , 'min', 'max']
+    # resample_types = ['mean']  # , 'min', 'max']
     resample_types = ['sum']
 
     # Applied to shift the entire time series by this offset.
-    tdelta = pd.Timedelta(0, unit='h')
+    tdelta = pd.Timedelta(0, unit='min')
 
     assert out_fmt in ('.csv', '.pkl', '.h5')
 
@@ -92,7 +94,7 @@ def main():
         counts_df[counts_df < min_count] = float('nan')
         counts_df[counts_df >= min_count] = 1.0
 
-        assert counts_df.max().max() <= 1.0
+        assert counts_df.max().max() <= 1.0, counts_df.max().max()
 
         for resample_type in resample_types:
 

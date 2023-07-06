@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 @author: Faizan-Uni-Stuttgart
 
@@ -11,6 +13,7 @@ import time
 import timeit
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from osgeo import ogr
 
@@ -23,20 +26,20 @@ def main():
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'neckar_1hr_wind_data_20km_buff/hourly_ff_epsg32632.csv')
+    in_crds_file = Path(r'utm32n/hourly_ppt_epsg32632.csv')
 
     sep = ';'
 
     subset_shp_file = Path(
-        r'P:\Synchronize\IWS\Colleagues_Students\Vazkan\wind_data\neckar_catchments.shp')
+        r'P:\Synchronize\IWS\QGIS_Neckar\vector\427_2km.shp')
 
     subset_shp_fld = 'DN'
-    shp_buff_dist = 20e3
+    shp_buff_dist = 50e3
 
     # If zero than no simplification is calculated.
     simplyify_tol = 90
 
-    out_dir = Path(r'neckar_1hr_wind_data_20km_buff')
+    out_dir = Path(r'daily_upper_neckar_50km_buff')
     #==========================================================================
 
     print('Reading inputs...')
@@ -47,6 +50,13 @@ def main():
 
     in_crds_df = pd.read_csv(
         in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y', 'Z']]
+
+    in_crds_x_fnt = np.isfinite(in_crds_df['X'].values)
+    in_crds_y_fnt = np.isfinite(in_crds_df['Y'].values)
+
+    in_crds_fnt = in_crds_x_fnt & in_crds_y_fnt
+
+    in_crds_df = in_crds_df.loc[in_crds_fnt].copy()
 
     # Remove duplicate, the user can also implement proper selection
     # because a change station location means a new time series normally.
