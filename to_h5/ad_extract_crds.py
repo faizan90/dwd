@@ -22,12 +22,12 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'U:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
-    in_dir = Path(r'P:\dwd_meteo\hourly\txt__raw_dwd_data')
+    in_dir = Path(r'U:\dwd_meteo\hourly\txt__raw_dwd_data')
 
-    out_data_col_pref = 'T'
+    out_data_col_pref = 'RF'
 
     # all columns are stripped of white spaces, and are capitalized
 
@@ -47,24 +47,39 @@ def main():
     # Can go in to dirs by having a slash.
 
     # Precipitation.
-    dir_name_patts = [
-        # '*_met/tageswerte_[0-9]*',
-        # '*_met/tageswerte_KL_[0-9]*',
-        # '*precip/tageswerte_RR_[0-9]*',
-        '*precip/stundenwerte_RR_[0-9]*'
-        ]
+    # dir_name_patts = [
+    #     # '*_met/tageswerte_[0-9]*',
+    #     # '*_met/tageswerte_KL_[0-9]*',
+    #     # 'hist_daily_precip/tageswerte_RR_[0-9]*',
+    #     'hist_hourly_precip/stundenwerte_RR_[0-9]*'
+    #     ]
 
     # Temperature.
     # dir_name_patts = [
     #     # '*_met/tageswerte_[0-9]*',
     #     # '*_met/tageswerte_KL_[0-9]*',
-    #     '*_temp/stundenwerte_TU_[0-9]*'
+    #     'hist_hourly_temp/stundenwerte_TU_[0-9]*'
     #     ]
 
     # Wind.
     # dir_name_patts = [
-    #     'hist_*/stundenwerte_FF_[0-9]*',
-    #     'pres_*/stundenwerte_FF_[0-9]*', ]
+    #     'hist_hourly_wind/stundenwerte_FF_[0-9]*',
+    #     # 'pres_hourly_wind/stundenwerte_FF_[0-9]*',
+    #     # '*_met/tageswerte_[0-9]*',
+    #     # '*_met/tageswerte_KL_[0-9]*',
+    #     ]
+
+    # Humidity.
+    dir_name_patts = [
+        'hist_hourly_humidity/stundenwerte_TF_[0-9]*',
+        # '*_met/tageswerte_[0-9]*',
+        # '*_met/tageswerte_KL_[0-9]*',
+        ]
+
+    # Solar radiation.
+    # dir_name_patts = [
+    #     'hourly_solar/stundenwerte_ST_[0-9]*_row',
+    #     ]
 
     seps = [';']
 
@@ -79,7 +94,7 @@ def main():
     out_sep = ';'
 
     out_dir = Path(f'crds/geo_crds')
-    out_name = f'hourly_ppt_geo_crds.{out_ext}'
+    out_name = f'hourly_rf_geo_crds.{out_ext}'
 
     # Append to or create a new output file.
     output_file_mode = 'a'

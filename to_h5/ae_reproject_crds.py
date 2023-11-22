@@ -21,7 +21,7 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'U:\dwd_meteo\daily\crds')
     os.chdir(main_dir)
 
     # Original
@@ -43,12 +43,12 @@ def main():
         out_file = Path(f'neckar_1hr_tem_data_20km_buff/hourly_tn_epsg{out_epsg}.csv')
 
     elif True:
-        in_file = Path(r'geo_crds\hourly_tem_geo_crds.csv')
+        in_file = Path(r'geo_crds\daily_tx_geo_crds.csv')
 
         in_epsg = 4326
         out_epsg = 32632
 
-        out_file = Path(f'utm32n/hourly_tem_epsg{out_epsg}.csv')
+        out_file = Path(f'utm32n/daily_tx_epsg{out_epsg}.csv')
 
     else:
         raise NotImplementedError

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 @author: Faizan-Uni-Stuttgart
 
@@ -18,14 +20,14 @@ DEBUG_FLAG = False
 
 def main():
 
-    # main_dir = Path(r'P:\dwd_meteo\daily\dfs__merged_subset')
+    main_dir = Path(r'D:\dwd_meteo\hourly')
 
-    main_dir = Path(r'P:\hydmod\rescaling_upper_neckar\hourly_2005_2022_spinterp_2km_pet\watersheds_lumped_tss')
+    # main_dir = Path(r'U:\TUM\projects\altoetting\tss\dwd')
 
     os.chdir(main_dir)
 
     # .csv and .pkl allowed.
-    in_df_path = Path(r'pet__EDK.csv')
+    in_df_path = Path(r'dfs__merged_subset/hourly_bayern_50km_buff_st_Y2005_2022_sqm.pkl')
 
     # In case of .csv
     sep = ';'
@@ -36,11 +38,11 @@ def main():
     hdf_key = 'hourly_resmapled_rr'
 
     # Can be .pkl or .csv.
-    # out_fmt = '.pkl'
-    out_fmt = '.csv'
+    out_fmt = '.pkl'
+    # out_fmt = '.csv'
     # out_fmt = '.h5'
 
-    out_dir = main_dir
+    out_dir = main_dir / r'dfs__resampled'
 
     # min_counts correspond to the resolutions. Each resolution when
     # being resampled should have a min-count to get a non Na value.
@@ -87,6 +89,11 @@ def main():
             assert min_count is None, 'For months, min_count must be None!'
 
             min_count = counts_df.index.days_in_month.values.reshape(-1, 1)
+
+        # elif resample_res == 'Y':
+        #     # assert min_count is None, 'For months, min_count must be None!'
+        #
+        #     min_count = counts_df.index.days_in_year.values.reshape(-1, 1)
 
         else:
             pass

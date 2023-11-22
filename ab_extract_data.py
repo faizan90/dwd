@@ -20,10 +20,10 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo')
+    main_dir = Path(r'U:\dwd_meteo')
     os.chdir(main_dir)
 
-    in_dir = Path(r'zipped_DWD_data')
+    in_dir = Path(r'zipped_DWD_data/hourly')
     out_dir = Path(r'hourly/txt__raw_dwd_data')
 
     # Using zipfile instead.

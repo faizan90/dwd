@@ -22,11 +22,11 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly\crds')
+    main_dir = Path(r'U:\dwd_meteo\hourly\crds')
     os.chdir(main_dir)
 
     # NOTE: in_crds_file and subset_shp_file should have the same CRS.
-    in_crds_file = Path(r'utm32n/hourly_ppt_epsg32632.csv')
+    in_crds_file = Path(r'utm32n\hourly_tem_epsg32632.csv')
 
     sep = ';'
 
@@ -34,12 +34,13 @@ def main():
         r'P:\Synchronize\IWS\QGIS_Neckar\vector\427_2km.shp')
 
     subset_shp_fld = 'DN'
+    # subset_shp_fld = 'ID_0'
     shp_buff_dist = 50e3
 
     # If zero than no simplification is calculated.
-    simplyify_tol = 90
+    simplyify_tol = 0.1
 
-    out_dir = Path(r'daily_upper_neckar_50km_buff')
+    out_dir = Path(r'hourly_upper_neckar_50km_buff')
     #==========================================================================
 
     print('Reading inputs...')
@@ -49,7 +50,11 @@ def main():
     assert cat_buff
 
     in_crds_df = pd.read_csv(
-        in_crds_file, sep=sep, index_col=0, engine='python')[['X', 'Y', 'Z']]
+        in_crds_file,
+        sep=sep,
+        index_col=0,
+        engine='python',
+        encoding='latin1')
 
     in_crds_x_fnt = np.isfinite(in_crds_df['X'].values)
     in_crds_y_fnt = np.isfinite(in_crds_df['Y'].values)

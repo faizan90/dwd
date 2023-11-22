@@ -23,7 +23,7 @@ DEBUG_FLAG = True
 
 def main():
 
-    main_dir = Path(r'P:/dwd_meteo')
+    main_dir = Path(r'U:/dwd_meteo')
     os.chdir(main_dir)
 
     out_dir = Path(r'zipped_DWD_data')
@@ -35,14 +35,14 @@ def main():
     data_vars = (
         # ('hist_daily_met',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/kl/historical/',
-        #  (r'daily/txt__raw_dwd_data/hist_daily_met.7z',)),
+        #  (r'daily/txt__raw_dwd_data/hist_daily_met.7z', r'daily/txt__raw_dwd_data/hist_daily_met2.7z',)),
         # ('pres_daily_met',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/kl/recent/',
         #  (None,)),
 
         # ('hist_daily_more_precip',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/more_precip/historical/',
-        #  (r'daily/txt__raw_dwd_data/hist_daily_more_precip.7z',)),
+        #  (r'daily/txt__raw_dwd_data/hist_daily_more_precip.7z', r'daily/txt__raw_dwd_data/hist_daily_more_precip2.7z',)),
         # ('pres_daily_more_precip',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/more_precip/recent/',
         #  (None,)),
@@ -52,78 +52,100 @@ def main():
         #  None),
         # ('pres_daily_soil_temp',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/soil_temperature/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('daily_solar',
         #  r'/climate_environment/CDC/observations_germany/climate/daily/solar/',
-        #  None),
-
-        ('hist_hourly_precip',
-         r'/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/',
-         (r'hourly/txt__raw_dwd_data/hist_hourly_precip.7z',)),
-        ('pres_hourly_precip',
-         r'/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/',
-         (None,)),
-
-        ('hist_hourly_temp',
-         r'/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/',
-         (r'hourly/txt__raw_dwd_data/hist_hourly_temp.7z',)),
-        ('pres_hourly_temp',
-         r'/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/',
-         (None,)),
+        #  (None,)),
         #
+
+        # ('hist_hourly_precip',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/',
+        #  (r'hourly/txt__raw_dwd_data/hist_hourly_precip.7z', r'hourly/txt__raw_dwd_data/hist_hourly_precip2.7z',)),
+        # ('pres_hourly_precip',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/',
+        #  (None,)),
+        #
+
+        # ('hist_hourly_temp',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/',
+        #  (r'hourly/txt__raw_dwd_data/hist_hourly_temp.7z', r'hourly/txt__raw_dwd_data/hist_hourly_temp2.7z',)),
+        # ('pres_hourly_temp',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/',
+        #  (None,)),
+        #
+
         # ('hist_hourly_cloud_type',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/cloud_type/historical/',
         #  None),
         # ('pres_hourly_cloud_type',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/cloud_type/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('hist_hourly_cloudiness',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/cloudiness/historical/',
-        #  None),
+        #  (None,)),
         # ('pres_hourly_cloudiness',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/cloudiness/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('hist_hourly_pressure',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/pressure/historical/',
-        #  None),
+        #  (None,)),
         # ('pres_hourly_pressure',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/pressure/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('hist_hourly_soil_temp',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/soil_temperature/historical/',
-        #  None),
+        #  (None,)),
         # ('pres_hourly_soil_temp',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/soil_temperature/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('hourly_solar',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/solar/',
-        #  None),
+        #  (None,)),  # Has no dates in the names so just redownload all.
         #
+
+        ('10min_solar',
+         r'/climate_environment/CDC/observations_germany/climate/10_minutes/solar/historical/',
+         (None,)),
+
         # ('hist_hourly_sun',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/sun/historical/',
         #  None),
         # ('pres_hourly_sun',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/sun/recent/',
-        #  None),
+        #  (None,)),
         #
+
+        # ('hist_hourly_humidity',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/moisture/historical/',
+        #  (None,)),
+        # ('pres_hourly_humidity',
+        #  r'/climate_environment/CDC/observations_germany/climate/hourly/moisture/recent/',
+        #  (None,)),
+
         # ('hist_hourly_visib',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/visibility/historical/',
-        #  None),
+        #  (None,)),
         # ('pres_hourly_visib',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/visibility/recent/',
-        #  None),
+        #  (None,)),
         #
+
         # ('hist_hourly_wind',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/',
-        #  r'hourly/txt__raw_dwd_data/hist_hourly_wind.7z'),
+        #  (r'hourly/txt__raw_dwd_data/hist_hourly_wind.7z',)),
         # ('pres_hourly_wind',
         #  r'/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/',
-        #  None),
+        #  (None,)),
         )
 
     assert all([len(data_var) == 3 for data_var in data_vars])

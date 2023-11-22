@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 @author: Faizan-Uni-Stuttgart
 
@@ -24,21 +26,24 @@ DEBUG_FLAG = False
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\daily')
+    main_dir = Path(r'U:\dwd_meteo\hourly')
     os.chdir(main_dir)
 
     data_dirs = [
-        Path(r'hdf5__all_dss\daily_tx_annual')]
+        Path(r'hdf5__all_dss\annual_ppt')]
 
     data_name_patts = [
-        'TX_Y{year:4d}.h5'
-        # 'P_Y{year:4d}.h5'
+        # 'TX_Y{year:4d}.h5'
+        'P_Y{year:4d}.h5'
         # 'F_Y{year:4d}.h5'
+        # 'T_Y{year:4d}.h5'
+        # 'ST_Y{year:4d}.h5'
+        # 'RF_Y{year:4d}.h5'
         ]
 
     # Assuming that it is the output of af_subset_crds.py
     crds_file = Path(
-        r'crds\daily_upper_neckar_50km_buff\daily_tx_epsg32632.csv')
+        r'crds\hourly_upper_neckar_50km_buff\hourly_ppt_epsg32632.csv')
 
     sep = ';'
 
@@ -46,13 +51,13 @@ def main():
 
     # Should correspond to the resolution of the input data.
     # Seconds is the rounding resolution.
-    beg_time = '2004-01-01 00:00:00'
-    end_time = '2023-12-31 23:00:00'  #  For hours, may need to give one more day.
+    beg_time = '2005-01-01 00:00:00'
+    end_time = '2022-12-31 23:00:00'  #  For hours, may need to give one more day.
 
     # The units and calendar are taken from whatever input file came first.
     # This does not matter as, at the end, the strings are saved anyways.
     out_data_path = Path(
-        f'hdf5__merged_subset/daily_upper_neckar_50km_buff_tx_Y2005_2022.h5')
+        f'hdf5__merged_subset/hourly_upper_neckar_50km_buff_ppt_Y2005_2022.h5')
 
     overwrite_output_flag = True
     #==========================================================================

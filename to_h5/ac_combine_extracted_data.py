@@ -21,19 +21,19 @@ from netCDF4 import date2num
 
 DEBUG_FLAG = False
 
-MSGS_FLAG = True
+MSGS_FLAG = False
 
 DATA_TXT_PREF = 'produkt*'
 
 
 def main():
 
-    main_dir = Path(r'P:\dwd_meteo\hourly')
+    main_dir = Path(r'U:\dwd_meteo\daily')
     os.chdir(main_dir)
 
     # DATA_TXT_PREF might need changing based on dataset.
 
-    in_dir = Path(r'txt__raw_dwd_data/pres_hourly_temp')
+    in_dir = Path(r'txt__raw_dwd_data/hist_daily_met')
 
     # NOTE: all columns are stripped of white spaces around them, and are
     # capitalized before search in the input files.
@@ -45,9 +45,9 @@ def main():
     # out_data_col_pref = 'P'
 
     # Temp mean or hourly.
-    data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
+    # data_cols = ['TMK', 'LUFTTEMPERATUR', 'TT_TU']
     # out_data_col_pref = 'TG'  # For Daily.
-    out_data_col_pref = 'T'  # For hourly.
+    # out_data_col_pref = 'T'  # For hourly.
 
     # Temp minimum.
     # data_cols = ['TNK', 'LUFTTEMPERATUR_MINIMUM']
@@ -58,17 +58,33 @@ def main():
     # out_data_col_pref = 'TX'  # Only for daily.
 
     # Wind
-    # data_cols = ['F', ]
-    # out_data_col_pref = 'F'
+    # data_cols = ['F', ]  # Hourly.
+    # out_data_col_pref = 'F'  # Hourly.
+
+    # data_cols = ['FM', 'WINDGESCHWINDIGKEIT', ]  # Daily.
+    # out_data_col_pref = 'FM'  # Daily
+
+    # Solar radiation.
+    # data_cols = ['FG_LBERG', ]  # Hourly.
+    # out_data_col_pref = 'ST'  # Hourly.
+
+    # Relative humidity.
+    # data_cols = ['RF_STD']  #  Hourly.
+    # out_data_col_pref = 'RF'  # Hourly.
+
+    data_cols = ['REL_FEUCHTE', 'UPM']  # Daily.
+    out_data_col_pref = 'RF'  # Daily.
 
     # Directory names. These have files for each station.
     # match_patt = '1minutenwerte_nieder_*'  # minute
-    match_patt = 'stundenwerte_TU_*'  # hourly
+    # match_patt = 'stundenwerte_TU_*'  # hourly
     # match_patt = '*stundenwerte_RR_*'  # hourly
     # match_patt = 'tageswerte_[0-9]*'  # daily
     # match_patt = 'tageswerte_RR_[0-9]*'  # daily
-    # match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
+    match_patt = 'tageswerte_KL_[0-9]*'  # daily pres, daily hist
     # match_patt = 'stundenwerte_FF_*'  # hourly wind
+    # match_patt = 'stundenwerte_ST_*'  # hourly solar
+    # match_patt = 'stundenwerte_TF_*'  # hourly humidity
 
     # If interval_flag then, len(time_cols) == 2.
     # First label in time_cols is for the time at which the reading began.
@@ -87,22 +103,23 @@ def main():
     seps = [';']
 
     # time_fmts = ['%Y%m%d%H%M']  # minute
-    time_fmts = ['%Y%m%d%H']  # hourly
-    # time_fmts = ['%Y%m%d']  # daily
+    # time_fmts = ['%Y%m%d%H']  # hourly
+    # time_fmts = ['%Y%m%d%H:%M']  # hourly solar
+    time_fmts = ['%Y%m%d']  # daily
 
     nan_vals = [-999]
 
     nc_calendar = 'gregorian'
 
     # Can be D, H, min, or T only.
-    out_freq = 'H'
+    out_freq = 'D'
 
     # Can be months or years. Both are used in search in ag_subset_h5_data
     sep_basis = 'years'
 
-    out_dir = Path(f'hdf5__all_dss/annual_tem')
+    out_dir = Path(f'hdf5__all_dss/daily_rf_annual')
 
-    n_cpus = 4
+    n_cpus = 8
     #==========================================================================
 
     out_dir.mkdir(exist_ok=True, parents=True)
@@ -266,7 +283,7 @@ def get_time_intervals(raw_df_cols, time_cols, time_fmts, raw_df, out_freq):
     return time_intervals, time_reindex
 
 
-def updt_df_index(out_df, time_fmts):
+def updt_df_index(out_df, time_fmts, out_freq):
 
     time_fmt_flag = False
     for time_fmt in time_fmts:
@@ -280,6 +297,8 @@ def updt_df_index(out_df, time_fmts):
             pass
 
     assert time_fmt_flag, 'None of the time_fmts worked!'
+
+    time_vals = time_vals.round(freq=out_freq)
 
     out_df.index = time_vals
     return
@@ -411,9 +430,11 @@ def write_updt_h5_file(
         stn_ds[:] = np.nan
 
     n_exist_vals = np.isfinite(stn_ds[date2nums_idxs][:]).sum()
+
     n_updat_vals = np.isfinite(out_df.iloc[sel_idxs, 0].values).sum()
 
-    print('n_exist_vals, n_updat_vals:', n_exist_vals, n_updat_vals)
+    if n_exist_vals != n_updat_vals:
+        print('n_exist_vals, n_updat_vals:', n_exist_vals, n_updat_vals)
 
     stn_ds[date2nums_idxs] = out_df.iloc[sel_idxs, 0].values
 
@@ -668,7 +689,7 @@ def reformat_and_save(args):
                 time_reindex = None
 
             if not isinstance(out_df.index, pd.DatetimeIndex):
-                updt_df_index(out_df, time_fmts)
+                updt_df_index(out_df, time_fmts, out_freq)
 
             out_df = out_df.iloc[~out_df.index.duplicated('first'),:]
 
